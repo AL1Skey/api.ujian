@@ -142,3 +142,7 @@ Route::prefix("/ujian")->group(function(){
         Route::post("/sesi_soal", [SesiSoalController::class, "store"]);
     });
 });
+
+Route::get("/something", function(){
+    return response()->json(["message" => "Server is up"]);
+});

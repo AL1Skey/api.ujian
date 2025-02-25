@@ -6,26 +6,21 @@ use App\Models\Guru;
 use App\Models\Peserta;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use App\Helper\JwtHelper;
 
 trait AuthGuruTrait
 {
     public function guruRegister(Request $request)
     {
         try {
-            $data = $this->validateGuruRequest($request);
-            $guru = Guru::create([
-                'username' => $data['username'],
-                'password' => Hash::make($data['password']),
-                'nama' => $data['nama'],
-                'alamat' => $data['alamat'],
-                'jurusan_id' => $data['jurusan_id'],
-                'agama_id' => $data['agama_id']
-            ]);
+            $data = $this->handleRequest($request);
+            $data['password'] = Hash::make($data['password']);
+            // dd($data);
+            $guru = Guru::create(
+                $data
+            );
 
-            $token = JWTAuth::fromUser($guru);
-            return response()->json(compact('guru', 'token'), 201);
+            return response()->json(compact('guru'), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -33,15 +28,32 @@ trait AuthGuruTrait
 
     public function guruLogin(Request $request)
     {
-        $credentials = $request->only('username', 'password');
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 400);
+            $request->validate([
+                "username" => "required",
+                "password"=> "required",
+            ]);
+            $credentials = $request->only('username', 'password');
+
+            $guru = Guru::where('username', $credentials['username'])->first();
+
+            if (!$guru) {
+                return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
             }
-            $user = JWTAuth::user();
-            $token = JWTAuth::claims(['user' => $user])->fromUser($user);
-            return response()->json(compact('user', 'token'), 201);
-        } catch (JWTException $e) {
+
+            $verifyPassword = Hash::check($credentials['password'], $guru->password);
+
+            if(!$verifyPassword) {
+                return response()->json(['error'=> 'invalid_credentials'],400);
+            }
+            $data = $guru->toArray();
+            $token = JwtHelper::generateToken($data, 3600);
+
+            return response()->json(compact('guru', 'token'), 200);
+
+
+
+        } catch (\Exception $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
     }
@@ -49,9 +61,9 @@ trait AuthGuruTrait
     public function guruLogout(Request $request)
     {
         try {
-            JWTAuth::invalidate(JWTAuth::getToken());
+            // JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Successfully logged out'], 200);
-        } catch (JWTException $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'could_not_logout'], 500);
         }
     }
@@ -85,7 +97,8 @@ trait AuthPesertaTrait
                 'kelas_id' => $data['kelas_id']
             ]);
 
-            $token = JWTAuth::fromUser($peserta);
+            $data = $peserta->toArray();
+            $token = JwtHelper::generateToken($data, 3600);
             return response()->json(compact('peserta', 'token'), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -96,13 +109,23 @@ trait AuthPesertaTrait
     {
         $credentials = $request->only('nomor_peserta', 'password');
         try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 400);
+
+            $peserta = Peserta::where('nomor_peserta', $credentials['nomor_peserta'])->first();
+
+            if (!$peserta) {
+                return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
             }
-            $user = JWTAuth::user();
-            $token = JWTAuth::claims(['user' => $user])->fromUser($user);
-            return response()->json(compact('user', 'token'), 201);
-        } catch (JWTException $e) {
+
+            $verifyPassword = Hash::check($credentials['password'], $peserta->password);
+
+            if(!$verifyPassword) {
+                return response()->json(['error'=> 'invalid_credentials'],400);
+            }
+            $data = $peserta->toArray();
+            $token = JwtHelper::generateToken($data, 3600);
+
+            return response()->json(compact('peserta', 'token'), 200);
+        } catch (\Exception $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }
     }
@@ -110,9 +133,9 @@ trait AuthPesertaTrait
     public function pesertaLogout(Request $request)
     {
         try {
-            JWTAuth::invalidate(JWTAuth::getToken());
+            // JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Successfully logged out'], 200);
-        } catch (JWTException $e) {
+        } catch (\Exception $e) {
             return response()->json(['error' => 'could_not_logout'], 500);
         }
     }
@@ -134,5 +157,7 @@ trait AuthPesertaTrait
 class AuthController extends Controller
 {
     use AuthGuruTrait, AuthPesertaTrait;
+
+    
 
 }

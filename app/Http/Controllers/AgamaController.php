@@ -32,17 +32,15 @@ class AgamaController extends Controller
     {
         //
         try {
-            if (
-                $validator = $request->validate([
-                    'nama' => 'required|string',
-                ])
-            ) {
-                return response()->json(['error' => $validator->errors()], 400);
-            }
+            $request->validate([
+                'nama' => 'required',
+            ]);
+
             $data = $this->handleRequest($request);
             $agama = Agama::create($data);
             return response()->json($agama, 201);
         } catch (\Exception $e) {
+            dd("AAAAAAA");
             return response()->json(['error' => $e->getMessage()], 400);
         }
 
