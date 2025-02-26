@@ -15,8 +15,8 @@ class DaftarKelasController extends Controller
         //
         $kelas = Daftar_Kelas::query();
 
-        if ($request->query('name')) {
-            $kelas->where('name', 'like', '%' . $request->query('name') . '%');
+        if ($request->query('nama')) {
+            $kelas->where('nama', 'like', '%' . $request->query('nama') . '%');
         }
         return response()->json($kelas->paginate(10));
     }
@@ -29,7 +29,7 @@ class DaftarKelasController extends Controller
         try {
             //
             $request->validate([
-                'name' => 'required|string',
+                'nama' => 'required|string',
             ]);
             $data = $this->handleRequest($request);
             $kelas = Daftar_Kelas::create($data);
@@ -64,7 +64,7 @@ class DaftarKelasController extends Controller
         //
         try {
             $request->validate([
-                'name' => 'required|string',
+                'nama' => 'required|string',
             ]);
             $data = $this->handleRequest($request);
             $kelas = Daftar_Kelas::find($id);

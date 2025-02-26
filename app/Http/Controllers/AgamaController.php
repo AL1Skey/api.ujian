@@ -73,17 +73,15 @@ class AgamaController extends Controller
     {
         //
         try {
+            // dd($request,"AAAAAAAA",$id);
+            $request->validate([
+                'nama' => 'required',
+            ]);
             $agama = Agama::find($id);
             if (!$agama) {
                 return response()->json(['error' => 'Data not found'], 404);
             }
-            if (
-                $validator = $request->validate([
-                    'nama' => 'required|string',
-                ])
-            ) {
-                return response()->json(['error' => $validator->errors()], 400);
-            }
+
             $data = $this->handleRequest($request);
             $agama->update($data);
             return response()->json($agama, 200);

@@ -33,7 +33,7 @@ class KelompokUjianController extends Controller
         try {
             $request->validate([
                 'nama' => 'required|string',
-                'id_sekolah' => 'string',
+                'id_sekolah' => '',
                 'start_date' => 'date',
                 'end_date' => 'date',
             ]);

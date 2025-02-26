@@ -5,7 +5,10 @@ namespace App\Http\Middleware;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
-use App\Helpers\JwtHelper;
+use App\Helper\JwtHelper;
+use App\Models\Guru;
+use App\Models\Peserta;
+use Illuminate\Support\Facades\Hash;
 
 class JwtMiddleware
 {
@@ -28,13 +31,47 @@ class JwtMiddleware
         try {
             // Validate and decode the token using our helper
             $decoded = JwtHelper::verifyToken($token);
+            $user = null;
+            $role = explode('/', $request->path())[1];
+            // dd($role,isset($decoded['nomor_peserta']));
+            // dd($decoded);
             
-            // Optionally, attach the decoded payload to the request (accessible in controllers)
-            $request->attributes->add(['jwt_payload' => $decoded]);
-        } catch (Exception $e) {
-            return response()->json(['error' => 'Invalid token'], 401);
-        }
+            switch ($role) {
+                case 'admin':
+                    if (isset($decoded['username'])) {
+                        $user = Guru::where('username', $decoded['username'])->first();
+                        dd($decoded['password'], $user->password);
+                        $verifyPassword = Hash::check($decoded['password'], $user->password);
+                        if (!$verifyPassword) {
+                            return response()->json(['error' => 'invalid_credentials'], 400);
+                        }
+                    } else {
+                        return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
+                    }
+                    break;
+                case 'siswa':
+                    if (isset($decoded['nomor_peserta'])) {
+                        $user = Peserta::where('nomor_peserta', $decoded['nomor_peserta'])->first();
+                        $verifyPassword = Hash::check($decoded['password'], $user->password);
+                        if (!$verifyPassword) {
+                            return response()->json(['error' => 'invalid_credentials'], 400);
+                        }
+                    } else {
+                        return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
+                    }
+                    break;
+                default:
+                    return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
+            }
+            // dd($request);
 
-        return $next($request);
+            //  attach the decoded payload to the request (accessible in controllers)
+            $request->attributes->add(['jwt_payload' => $user]);
+
+            return $next($request);
+        } catch (Exception $e) {
+            return response()->json(['error' => 'Invalid token','err'=>$e->getMessage()], 401);
+        }
+       
     }
 }

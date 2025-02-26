@@ -47,6 +47,7 @@ trait AuthGuruTrait
                 return response()->json(['error'=> 'invalid_credentials'],400);
             }
             $data = $guru->toArray();
+            $data['password'] = $guru->password;
             $token = JwtHelper::generateToken($data, 3600);
 
             return response()->json(compact('guru', 'token'), 200);
@@ -122,6 +123,7 @@ trait AuthPesertaTrait
                 return response()->json(['error'=> 'invalid_credentials'],400);
             }
             $data = $peserta->toArray();
+            $data['password'] = $peserta->password;
             $token = JwtHelper::generateToken($data, 3600);
 
             return response()->json(compact('peserta', 'token'), 200);

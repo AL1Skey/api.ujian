@@ -20,6 +20,9 @@ class MapelController extends Controller
             }
             return response()->json($mapel->paginate(10));
         }
+        catch(\Exception $e){
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
 
     }
 

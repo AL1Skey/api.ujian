@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AgamaController;
-use App\Http\Controllers\KelasController;
+use App\Http\Controllers\DaftarKelasController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KelompokUjianController;
@@ -12,7 +12,6 @@ use App\Http\Controllers\SesiUjianController;
 use App\Http\Controllers\SesiSoalController;
 use App\Http\Controllers\SoalController;
 use App\Http\Controllers\UjianController;
-use App\Http\Controllers\DaftarKelasController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\JwtMiddleware;
 
@@ -29,13 +28,6 @@ Route::prefix("/admin")->group(function () {
         Route::post("/agama", [AgamaController::class, "store"]);
         Route::put("/agama/{id}", [AgamaController::class, "update"]);
         Route::delete("/agama/{id}", [AgamaController::class, "destroy"]);
-
-        // Kelas
-        Route::get("/kelas", [KelasController::class, "index"]);
-        Route::get("/kelas/{id}", [KelasController::class, "show"]);
-        Route::post("/kelas", [KelasController::class, "store"]);
-        Route::put("/kelas/{id}", [KelasController::class, "update"]);
-        Route::delete("/kelas/{id}", [KelasController::class, "destroy"]);
 
         // Guru
         Route::get("/guru", [GuruController::class, "index"]);
@@ -112,7 +104,7 @@ Route::prefix("/admin")->group(function () {
 
     Route::prefix("/public")->group(function(){
         Route::get("/agama", [AgamaController::class, "index"]);
-        Route::get("/kelas", [KelasController::class, "index"]);
+        Route::get("/kelas", [DaftarKelasController::class, "index"]);
         Route::get("/guru", [GuruController::class, "index"]);
         Route::get("/jurusan", [JurusanController::class, "index"]);
         Route::get("/kelompok_ujian", [KelompokUjianController::class, "index"]);
@@ -127,7 +119,7 @@ Route::prefix("/admin")->group(function () {
 
 });
 
-Route::prefix("/ujian")->group(function(){
+Route::prefix("/siswa")->group(function(){
     Route::post("/login", [AuthController::class, "pesertaLogin"]);
     Route::post("/register", [AuthController::class, "pesertaRegister"]);
     Route::post("/logout", [AuthController::class, "pesertaLogout"]);
