@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Ujian;
 use Illuminate\Http\Request;
+use App\Models\Kelompok_Ujian;
+use App\Models\Mapel;
+use App\Models\Daftar_Kelas;
 
 class UjianController extends Controller
 {
@@ -48,6 +51,19 @@ class UjianController extends Controller
                 'status' => 'required|string'
             ]);
             $data = $this->handleRequest($request);
+            $check_kelompok = Kelompok_Ujian::query()->find($request->kelompok_id);
+            if(!$check_kelompok) {
+                $data['kelompok_id'] = null;
+            }
+            $check_mapel = Mapel::query()->find($request->mapel_id);
+            if(!$check_mapel) {
+                $data['mapel_id'] = null;
+            }
+            $check_kelas = Daftar_Kelas::query()->find($request->kelas_id);
+            if(!$check_kelas) {
+                $data['kelas_id'] = null;
+            }
+
             $ujian = Ujian::create($data);
             return response()->json($ujian, 201);
         } catch (\Exception $e) {
@@ -92,7 +108,21 @@ class UjianController extends Controller
                 'end_date' => 'date',
                 'status' => 'string'
             ]);
+
             $data = $this->handleRequest($request);
+            $check_kelompok = Kelompok_Ujian::query()->find($request->kelompok_id);
+            if(!$check_kelompok) {
+                $data['kelompok_id'] = null;
+            }
+            $check_mapel = Mapel::query()->find($request->mapel_id);
+            if(!$check_mapel) {
+                $data['mapel_id'] = null;
+            }
+            $check_kelas = Daftar_Kelas::query()->find($request->kelas_id);
+            if(!$check_kelas) {
+                $data['kelas_id'] = null;
+            }
+
             $ujian->fill($data);
             $ujian->save();
             return response()->json($ujian, 200);

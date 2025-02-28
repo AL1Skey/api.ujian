@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,10 +18,10 @@ return new class extends Migration
             $table->string('nama');
             $table->string('alamat');
             $table->unsignedBigInteger('mapel_id')->nullable();
-            $table->foreign('mapel_id')->references('id')->on('mapels')->onDelete('cascade');
+            $table->foreign('mapel_id')->references('id')->on('mapels')->nullOnDelete()->cascadeOnUpdate();
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('agama_id')->nullable();
-            $table->foreign('agama_id')->references('id')->on('agamas')->onDelete('cascade');
+            $table->foreign('agama_id')->references('id')->on('agamas')->nullOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }

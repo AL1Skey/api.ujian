@@ -12,7 +12,12 @@ class Sesi_Ujian extends Model
 
     public function ujian()
     {
-        return $this->belongsTo(Ujian::class,'ujian_id','id');
+        $ujian =  $this->belongsTo(Ujian::class,'ujian_id','id');
+        $ujian->with('kelas');
+        $ujian->with('mapel');
+        $ujian->with('kelompok_ujian');
+
+        return $ujian;
     }
 
     public function peserta()

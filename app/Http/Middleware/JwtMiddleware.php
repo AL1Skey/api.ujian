@@ -40,7 +40,7 @@ class JwtMiddleware
                 case 'admin':
                     if (isset($decoded['username'])) {
                         $user = Guru::where('username', $decoded['username'])->first();
-                        dd($decoded['password'], $user->password);
+                        // dd($decoded['password'], $user->password);
                         $verifyPassword = Hash::check($decoded['password'], $user->password);
                         if (!$verifyPassword) {
                             return response()->json(['error' => 'invalid_credentials'], 400);

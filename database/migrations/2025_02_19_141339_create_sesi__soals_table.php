@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,11 +13,11 @@ return new class extends Migration
         Schema::create('sesi__soals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('sesi_ujian_id');
-            $table->foreign('sesi_ujian_id')->references('id')->on('sesi__ujians')->onDelete('cascade');
+            $table->foreign('sesi_ujian_id')->references('id')->on('sesi__ujians')->nullOnDelete()->cascadeOnUpdate();
             $table->unsignedBigInteger('nomor_peserta')->nullable();
-            $table->foreign('nomor_peserta')->references('nomor_peserta')->on('pesertas')->onDelete('cascade');
+            $table->foreign('nomor_peserta')->references('nomor_peserta')->on('pesertas')->nullOnDelete()->cascadeOnUpdate();
             $table->unsignedBigInteger('soal_id');
-            $table->foreign('soal_id')->references('id')->on('soals')->onDelete('cascade');
+            $table->foreign('soal_id')->references('id')->on('soals')->nullOnDelete()->cascadeOnUpdate();
             $table->string('tipe_soal')->nullable();
             $table->string('jawaban')->nullable();
             $table->timestamps();

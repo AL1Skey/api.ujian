@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Soal;
 use Illuminate\Http\Request;
+use App\Models\Ujian;
 
 class SoalController extends Controller
 {
@@ -45,6 +46,12 @@ class SoalController extends Controller
                 "jawaban" => "string",
             ]);
             $data = $this->handleRequest($request);
+            
+            $check_ujian = Ujian::query()->find($request->ujian_id);
+            if(!$check_ujian) {
+                $data['ujian_id'] = null;
+            }
+
             $soal = Soal::create($data);
             return response()->json($soal, 201);
         }

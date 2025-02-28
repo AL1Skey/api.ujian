@@ -22,7 +22,7 @@ class Ujian extends Model
 
     public function kelas()
     {
-        return $this->belongsTo('App\Models\Kelas','kelas_id');
+        return $this->belongsTo('App\Models\Daftar_Kelas','kelas_id');
     }
     
 }
