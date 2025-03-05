@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('sesi__soals', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sesi_ujian_id');
+            $table->unsignedBigInteger('sesi_ujian_id')->nullable();
             $table->foreign('sesi_ujian_id')->references('id')->on('sesi__ujians')->nullOnDelete()->cascadeOnUpdate();
             $table->unsignedBigInteger('nomor_peserta')->nullable();
             $table->foreign('nomor_peserta')->references('nomor_peserta')->on('pesertas')->nullOnDelete()->cascadeOnUpdate();
