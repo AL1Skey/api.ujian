@@ -12,6 +12,13 @@ class Soal extends Model
 
     public function ujian()
     {
-        return $this->belongsTo(Ujian::class);
+        $ujian =  $this->belongsTo(Ujian::class,'ujian_id','id');
+        $ujian->with('kelas');
+        $ujian->with('mapel');
+        $ujian->with('kelompok_ujian');
+
+        return $ujian;
     }
+
+
 }

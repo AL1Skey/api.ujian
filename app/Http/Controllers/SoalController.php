@@ -86,14 +86,14 @@ class SoalController extends Controller
         try{
             $request->validate([
                 "ujian_id" => "integer",
-                "soal" => "string",
-                "tipe_soal" => "string",
-                "pilihan_a" => "string",
-                "pilihan_b" => "string",
-                "pilihan_c" => "string",
-                "pilihan_d" => "string",
-                "pilihan_e" => "string",
-                "jawaban" => "string",
+                // "soal" => "string",
+                // "tipe_soal" => "string",
+                // "pilihan_a" => "string",
+                // "pilihan_b" => "string",
+                // "pilihan_c" => "string",
+                // "pilihan_d" => "string",
+                // "pilihan_e" => "string",
+                // "jawaban" => "string",
             ]);
             $data = $this->handleRequest($request);
             $soal = Soal::findOrFail($id);
