@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Peserta;
+use App\Models\Jurusan;
+use App\Models\Agama;
+use App\Models\Daftar_Kelas;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class PesertaController extends Controller
 {
@@ -46,6 +50,28 @@ class PesertaController extends Controller
                 "kelas_id" => "integer",
             ]);
             $data = $this->handleRequest($request);
+
+            $checkJurusan = Jurusan::query()->find($request->jurusan_id);
+            if(!$checkJurusan){
+                $data['jurusan_id'] = null;
+            }
+            $checkAgama = Agama::query()->find($request->agama_id);
+            if(!$checkAgama){
+                $data['agama_id'] = null;
+            }
+            $checkKelas = Daftar_Kelas::query()->find($request->kelas_id);
+            if(!$checkKelas){
+                $data['kelas_id'] = null;
+            }
+            while (True){
+                $nomor_peserta = rand(100000, 999999);
+                $check_peserta = Peserta::query()->where("nomor_peserta", $nomor_peserta)->first();
+                if(!$check_peserta){
+                    $data['nomor_peserta'] = $nomor_peserta;
+                    break;
+                }
+            }
+            $data['password'] = Hash::make($data['password']);
             $peserta = Peserta::create($data);
             return response()->json($peserta, 201);
         }
@@ -75,9 +101,43 @@ class PesertaController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    
     public function update(Request $request, $id)
     {
-        //
+        try {
+            $request->validate([
+                "nama" => "sometimes|required",
+                "password" => "sometimes|required",
+                "alamat" => "sometimes|string",
+                "jurusan_id" => "sometimes|integer",
+                "agama_id" => "sometimes|integer",
+                "kelas_id" => "sometimes|integer",
+            ]);
+    
+            $peserta = Peserta::findOrFail($id);
+            $data = $this->handleRequest($request);
+    
+            $checkJurusan = Jurusan::query()->find($request->jurusan_id);
+            if (!$checkJurusan) {
+                $data['jurusan_id'] = null;
+            }
+            $checkAgama = Agama::query()->find($request->agama_id);
+            if (!$checkAgama) {
+                $data['agama_id'] = null;
+            }
+            $checkKelas = Daftar_Kelas::query()->find($request->kelas_id);
+            if (!$checkKelas) {
+                $data['kelas_id'] = null;
+            }
+            if($request->password){
+                $data['password'] = Hash::make($data['password']);
+            }
+    
+            $peserta->update($data);
+            return response()->json($peserta);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
     }
 
     /**
@@ -85,6 +145,12 @@ class PesertaController extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $peserta = Peserta::findOrFail($id);
+            $peserta->delete();
+            return response()->json(["message" => "Peserta deleted successfully"]);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
     }
 }

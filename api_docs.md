@@ -968,28 +968,37 @@
     }
     ```
 
--   ### Sesi Ujian
+-   ### Peserta
     **Method**:POST
-    **URL**:/admin/sesi_ujian
+    **URL**:/admin/peserta
     **Body**:
     ```json
     {
-        "ujian_id": "1",
-        "nomor_peserta":"ABCDE113"
+        "nama": "Adit",
+        "password": "$2y$12$IxzMi11r2lW.sd/aRWkqj.0SVwE1/cO7BzzsNBtG..1CS8B3XF14u",
+        "jurusan_id": "1",
+        "agama_id": "1",
+        "kelas_id": "1",
+        "nomor_peserta": 161131,
     }
     ```
     **Response**:
     ```json
     {
-        "nama":"VII",
-        "updated_at": "2025-03-15T03:20:32.000000Z",
-        "created_at": "2025-03-15T03:20:32.000000Z",
-        "id": 2
+        "nama": "Adit",
+        "password": "$2y$12$IxzMi11r2lW.sd/aRWkqj.0SVwE1/cO7BzzsNBtG..1CS8B3XF14u",
+        "jurusan_id": "1",
+        "agama_id": "1",
+        "kelas_id": "1",
+        "nomor_peserta": 161131,
+        "updated_at": "2025-03-15T04:34:16.000000Z",
+        "created_at": "2025-03-15T04:34:16.000000Z",
+        "id": 4
     }
     ```
 
     **Method**:GET
-    **URL**:/admin/sesi_ujian
+    **URL**:/admin/peserta
     **Response**:
     ```json
     {
@@ -997,15 +1006,228 @@
         "data": [
             {
                 "id": 1,
-                "nama":"VII",
-                "created_at": "2025-03-05T08:36:54.000000Z",
-                "updated_at": "2025-03-05T08:36:54.000000Z"
+                "nomor_peserta": 70249488,
+                "password": "AAAAAAAA",
+                "remember_token": null,
+                "nama": "Hindu",
+                "alamat": null,
+                "kelas_id": null,
+                "jurusan_id": null,
+                "agama_id": null,
+                "created_at": "2025-03-15T04:21:31.000000Z",
+                "updated_at": "2025-03-15T04:21:31.000000Z",
+                "jurusan": null,
+                "agama": null,
+                "kelas": null
             },
             {
                 "id": 2,
-                "nama":"VII",
-                "created_at": "2025-03-15T03:00:30.000000Z",
-                "updated_at": "2025-03-15T03:00:30.000000Z"
+                "nomor_peserta": 990771,
+                "password": "AAAAAAAA",
+                "remember_token": null,
+                "nama": "Budha",
+                "alamat": null,
+                "kelas_id": 1,
+                "jurusan_id": 1,
+                "agama_id": null,
+                "created_at": "2025-03-15T04:26:03.000000Z",
+                "updated_at": "2025-03-15T04:26:03.000000Z",
+                "jurusan": {
+                    "id": 1,
+                    "nama": "Cyber",
+                    "created_at": "2025-03-15T04:21:44.000000Z",
+                    "updated_at": "2025-03-15T04:21:44.000000Z"
+                },
+                "agama": null,
+                "kelas": {
+                    "id": 1,
+                    "nama": "VII",
+                    "created_at": "2025-03-15T04:22:00.000000Z",
+                    "updated_at": "2025-03-15T04:22:00.000000Z"
+                }
+            },
+            {
+                "id": 3,
+                "nomor_peserta": 210425,
+                "password": "AAAAAAAA",
+                "remember_token": null,
+                "nama": "Adit",
+                "alamat": null,
+                "kelas_id": 1,
+                "jurusan_id": 1,
+                "agama_id": 1,
+                "created_at": "2025-03-15T04:26:59.000000Z",
+                "updated_at": "2025-03-15T04:26:59.000000Z",
+                "jurusan": {
+                    "id": 1,
+                    "nama": "Cyber",
+                    "created_at": "2025-03-15T04:21:44.000000Z",
+                    "updated_at": "2025-03-15T04:21:44.000000Z"
+                },
+                "agama": {
+                    "id": 1,
+                    "nama": "Budha",
+                    "created_at": "2025-03-15T04:26:47.000000Z",
+                    "updated_at": "2025-03-15T04:26:47.000000Z"
+                },
+                "kelas": {
+                    "id": 1,
+                    "nama": "VII",
+                    "created_at": "2025-03-15T04:22:00.000000Z",
+                    "updated_at": "2025-03-15T04:22:00.000000Z"
+                }
+            }
+        ],
+        "first_page_url": "http://127.0.0.1:8000/api/admin/peserta?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "http://127.0.0.1:8000/api/admin/peserta?page=1",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/admin/peserta?page=1",
+                "label": "1",
+                "active": true
+            },
+            {
+                "url": null,
+                "label": "Next &raquo;",
+                "active": false
+            }
+        ],
+        "next_page_url": null,
+        "path": "http://127.0.0.1:8000/api/admin/peserta",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 3,
+        "total": 3
+    }
+    ```
+
+    **Method**:PUT
+    **URL**:/admin/peserta/{id}
+    **Body**:
+    ```json
+    {
+        "nama": "Budi",
+        "password": "AAAAAA",
+        "jurusan_id": "1",
+        "agama_id": "1",
+        "kelas_id": "1"
+    }
+    ```
+    **Response**:
+    ```json
+    {
+        "id": 1,
+        "nomor_peserta": 70249488,
+        "password": "$2y$12$XdYf1U9i5ll31/ygIT5r8.iYUF2fh4RyCef9jtd5d0GMhyTSHgTJa",
+        "remember_token": null,
+        "nama": "Budi",
+        "alamat": null,
+        "kelas_id": "1",
+        "jurusan_id": "1",
+        "agama_id": "1",
+        "created_at": "2025-03-15T04:21:31.000000Z",
+        "updated_at": "2025-03-15T04:43:49.000000Z"
+    }
+    ```
+
+    **Method**:DELETE
+    **URL**:/admin/peserta/{id}
+    **Response**:
+    ```json
+    {
+    "message": "Data deleted"
+    }
+    ```
+
+
+-   ### Sesi Ujian
+    **Method**:POST
+    **URL**:/admin/sesi_ujian
+    **Body**:
+    ```json
+    {
+        "ujian_id": "1",
+        "nomor_peserta":"210425"
+    }
+    ```
+    **Response**:
+    ```json
+    {
+        "ujian_id": "1",
+        "nomor_peserta": "210425",
+        "updated_at": "2025-03-15T04:28:19.000000Z",
+        "created_at": "2025-03-15T04:28:19.000000Z",
+        "id": 1
+    }
+    ```
+
+    **Method**:GET
+    **URL**:/admin/sesi_ujian
+    **Response**:
+    ```json
+   {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 1,
+                "ujian_id": 1,
+                "nomor_peserta": 210425,
+                "created_at": "2025-03-15T04:28:19.000000Z",
+                "updated_at": "2025-03-15T04:28:19.000000Z",
+                "ujian": {
+                    "id": 1,
+                    "kelompok_id": 1,
+                    "mapel_id": 1,
+                    "kelas_id": 1,
+                    "nama": "required|string",
+                    "id_sekolah": "1",
+                    "start_date": "20-2-2025",
+                    "end_date": "20-2-2025",
+                    "status": 1,
+                    "created_at": "2025-03-15T04:27:50.000000Z",
+                    "updated_at": "2025-03-15T04:27:50.000000Z",
+                    "kelas": {
+                        "id": 1,
+                        "nama": "VII",
+                        "created_at": "2025-03-15T04:22:00.000000Z",
+                        "updated_at": "2025-03-15T04:22:00.000000Z"
+                    },
+                    "mapel": {
+                        "id": 1,
+                        "nama": "Kimia",
+                        "created_at": "2025-03-15T04:21:49.000000Z",
+                        "updated_at": "2025-03-15T04:21:49.000000Z"
+                    },
+                    "kelompok_ujian": {
+                        "id": 1,
+                        "nama": "Ujian Tengah Semestar",
+                        "id_sekolah": "A123456",
+                        "start_date": "26-11-2025",
+                        "end_date": "2-12-2025",
+                        "created_at": "2025-03-15T04:21:54.000000Z",
+                        "updated_at": "2025-03-15T04:21:54.000000Z"
+                    }
+                },
+                "peserta": {
+                    "id": 3,
+                    "nomor_peserta": 210425,
+                    "password": "AAAAAAAA",
+                    "remember_token": null,
+                    "nama": "Adit",
+                    "alamat": null,
+                    "kelas_id": 1,
+                    "jurusan_id": 1,
+                    "agama_id": 1,
+                    "created_at": "2025-03-15T04:26:59.000000Z",
+                    "updated_at": "2025-03-15T04:26:59.000000Z"
+                }
             }
         ],
         "first_page_url": "http://127.0.0.1:8000/api/admin/sesi_ujian?page=1",
@@ -1033,8 +1255,8 @@
         "path": "http://127.0.0.1:8000/api/admin/sesi_ujian",
         "per_page": 10,
         "prev_page_url": null,
-        "to": 2,
-        "total": 2
+        "to": 1,
+        "total": 1
     }
     ```
 
@@ -1043,16 +1265,18 @@
     **Body**:
     ```json
     {
-        "nama":"VII"
+        "ujian_id": "1",
+        "nomor_peserta":"990771"
     }
     ```
     **Response**:
     ```json
     {
-        "nama":"VII",
-        "updated_at": "2025-03-15T03:00:30.000000Z",
-        "created_at": "2025-03-15T03:00:30.000000Z",
-        "id": 2
+        "id": 1,
+        "ujian_id": "1",
+        "nomor_peserta": "990771",
+        "created_at": "2025-03-15T04:28:19.000000Z",
+        "updated_at": "2025-03-15T04:46:13.000000Z"
     }
     ```
 

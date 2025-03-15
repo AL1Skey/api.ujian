@@ -87,20 +87,14 @@ trait AuthPesertaTrait
     public function pesertaRegister(Request $request)
     {
         try {
-            $data = $this->validatePesertaRequest($request);
-            $peserta = Peserta::create([
-                'nomor_peserta' => $data['nomor_peserta'],
-                'password' => Hash::make($data['password']),
-                'nama' => $data['nama'],
-                'alamat' => $data['alamat'],
-                'jurusan_id' => $data['jurusan_id'],
-                'agama_id' => $data['agama_id'],
-                'kelas_id' => $data['kelas_id']
-            ]);
+            $data = $this->handleRequest($request);
+            $data['password'] = Hash::make($data['password']);
+            // dd($data);
+            $peserta = Peserta::create(
+                $data
+            );
 
-            $data = $peserta->toArray();
-            $token = JwtHelper::generateToken($data, 3600);
-            return response()->json(compact('peserta', 'token'), 201);
+            return response()->json(compact('peserta'), 201);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -108,8 +102,12 @@ trait AuthPesertaTrait
 
     public function pesertaLogin(Request $request)
     {
-        $credentials = $request->only('nomor_peserta', 'password');
         try {
+            $request->validate([
+                "nomor_peserta" => "required",
+                "password"=> "required",
+            ]);
+            $credentials = $request->only('nomor_peserta', 'password');
 
             $peserta = Peserta::where('nomor_peserta', $credentials['nomor_peserta'])->first();
 
@@ -127,6 +125,9 @@ trait AuthPesertaTrait
             $token = JwtHelper::generateToken($data, 3600);
 
             return response()->json(compact('peserta', 'token'), 200);
+
+
+
         } catch (\Exception $e) {
             return response()->json(['error' => 'could_not_create_token'], 500);
         }

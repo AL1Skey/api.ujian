@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pesertas', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('nomor_peserta')->unique()->default(mt_rand(10000000, 99999999));
+            $table->unsignedBigInteger('nomor_peserta')->unique();
             $table->string('password');
             $table->rememberToken();
             $table->string('nama');
