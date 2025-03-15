@@ -1288,3 +1288,141 @@
         "message": "Data deleted"
     }
     ```
+
+-   ### Sesi Soal
+    **Method**:POST
+    **URL**:/admin/sesi_soal
+    **Body**:
+    ```json
+    {
+        "sesi_ujian_id": "1",
+        "soal_id":"1",
+        "nomor_peserta":"210425",
+        "jawaban":"Jakarta"
+    }
+    ```
+    **Response**:
+    ```json
+    {
+        "sesi_ujian_id": "1",
+        "soal_id": "1",
+        "nomor_peserta": "210425",
+        "jawaban": "Jakarta",
+        "updated_at": "2025-03-15T04:52:50.000000Z",
+        "created_at": "2025-03-15T04:52:50.000000Z",
+        "id": 1
+    }
+    ```
+
+    **Method**:GET
+    **URL**:/admin/sesi_soal
+    **Response**:
+    ```json
+   {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 1,
+                "sesi_ujian_id": 1,
+                "nomor_peserta": 210425,
+                "soal_id": 1,
+                "tipe_soal": null,
+                "jawaban": "Jakarta",
+                "created_at": "2025-03-15T04:52:50.000000Z",
+                "updated_at": "2025-03-15T04:52:50.000000Z",
+                "sesi_ujian": {
+                    "id": 1,
+                    "ujian_id": 1,
+                    "nomor_peserta": 990771,
+                    "created_at": "2025-03-15T04:28:19.000000Z",
+                    "updated_at": "2025-03-15T04:46:13.000000Z"
+                },
+                "soal": {
+                    "id": 1,
+                    "ujian_id": 1,
+                    "soal": "Apa ibu kota Indonesia?",
+                    "image": null,
+                    "tipe_soal": "pilihan_ganda",
+                    "pilihan_a": "Jakarta",
+                    "pilihan_b": "Bandung",
+                    "pilihan_c": "Surabaya",
+                    "pilihan_d": "Medan",
+                    "pilihan_e": "Makassar",
+                    "jawaban": "Jakarta",
+                    "created_at": "2025-03-15T04:27:53.000000Z",
+                    "updated_at": "2025-03-15T04:27:53.000000Z"
+                },
+                "peserta": {
+                    "id": 3,
+                    "nomor_peserta": 210425,
+                    "password": "AAAAAAAA",
+                    "remember_token": null,
+                    "nama": "Adit",
+                    "alamat": null,
+                    "kelas_id": 1,
+                    "jurusan_id": 1,
+                    "agama_id": 1,
+                    "created_at": "2025-03-15T04:26:59.000000Z",
+                    "updated_at": "2025-03-15T04:26:59.000000Z"
+                }
+            }
+        ],
+        "first_page_url": "http://127.0.0.1:8000/api/admin/sesi_soal?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "http://127.0.0.1:8000/api/admin/sesi_soal?page=1",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/admin/sesi_soal?page=1",
+                "label": "1",
+                "active": true
+            },
+            {
+                "url": null,
+                "label": "Next &raquo;",
+                "active": false
+            }
+        ],
+        "next_page_url": null,
+        "path": "http://127.0.0.1:8000/api/admin/sesi_soal",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 1,
+        "total": 1
+    }
+    ```
+
+    **Method**:PUT
+    **URL**:/admin/sesi_soal/{id}
+    **Body**:
+    ```json
+    {
+        "sesi_ujian_id": "1",
+        "soal_id":"1",
+        "nomor_peserta":"210425",
+        "jawaban":"Bekasi"
+    }
+    ```
+    **Response**:
+    ```json
+    {
+        "sesi_ujian_id": "1",
+        "soal_id":"1",
+        "nomor_peserta":"210425",
+        "jawaban":"Bekasi"
+    }
+    ```
+
+    **Method**:DELETE
+    **URL**:/admin/sesi_soal/{id}
+    **Response**:
+    ```json
+    {
+        "message": "Data deleted"
+    }
+    ```

@@ -38,7 +38,7 @@ class SesiSoalController extends Controller
             $request->validate([
                 'sesi_ujian_id' => 'required|integer',
                 'soal_id' => 'required|integer',
-                'peserta_id' => 'required|integer',
+                'nomor_peserta' => 'required|integer',
                 'jawaban' => 'string',
             ]);
             $data = $this->handleRequest($request);
@@ -78,7 +78,7 @@ class SesiSoalController extends Controller
             $request->validate([
                 'sesi_ujian_id' => 'integer',
                 'soal_id' => 'integer',
-                'peserta_id' => 'integer',
+                'nomor_peserta' => 'integer',
                 'jawaban' => 'string',
             ]);
             $data = $this->handleRequest($request);
