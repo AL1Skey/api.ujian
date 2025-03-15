@@ -37,9 +37,9 @@ class PesertaController extends Controller
         //
         try{
             $request->validate([
-                "nama" => "required|string",
-                "nomor_peserta" => "required|string",
-                "password" => "required|string",
+                "nama" => "required",
+                // "nomor_peserta" => "required",
+                "password" => "required",
                 "alamat" => "string",
                 "jurusan_id" => "integer",
                 "agama_id" => "integer",

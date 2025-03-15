@@ -2,7 +2,7 @@
 
 ## Auth
 
--   Login
+-   ### Login
     **Method**:POST
     **URL**:/admin/login
     **Body**:
@@ -34,7 +34,7 @@
     }
     ```
 
--   Register
+-   ### Register
     **Method**:POST
     **URL**:/admin/register
     **Body**:
@@ -65,7 +65,7 @@
 
 ## Admin
 
--   Agama
+-   ### Agama
     **Method**:POST
     **URL**:/admin/agama
     **Body**:
@@ -167,7 +167,7 @@
     }
     ```
 
--   Jurusan
+-   ### Jurusan
     **Method**:POST
     **URL**:/admin/jurusan
     **Body**:
@@ -269,7 +269,7 @@
     }
     ```
 
--   Mapel
+-   ### Mapel
     **Method**:POST
     **URL**:/admin/mapel
     **Body**:
@@ -365,7 +365,7 @@
     }
     ```
 
--   Kelompok Ujian
+-   ### Kelompok Ujian
     **Method**:POST
     **URL**:/admin/kelompok_ujian
     **Body**:
@@ -480,7 +480,7 @@
     ```
 
 
--   Daftar Kelas
+-   ### Daftar Kelas
     **Method**:POST
     **URL**:/admin/daftar_kelas
     **Body**:
@@ -576,7 +576,7 @@
     }
     ```
 
--   Ujian
+-   ### Ujian
     **Method**:POST
     **URL**:/admin/ujian
     **Body**:
@@ -756,7 +756,7 @@
     }
     ```
 
--   Soal
+-   ### Soal
     **Method**:POST
     **URL**:/admin/soal
     **Body**:
@@ -961,6 +961,103 @@
 
     **Method**:DELETE
     **URL**:/admin/soal/{id}
+    **Response**:
+    ```json
+    {
+        "message": "Data deleted"
+    }
+    ```
+
+-   ### Sesi Ujian
+    **Method**:POST
+    **URL**:/admin/sesi_ujian
+    **Body**:
+    ```json
+    {
+        "ujian_id": "1",
+        "nomor_peserta":"ABCDE113"
+    }
+    ```
+    **Response**:
+    ```json
+    {
+        "nama":"VII",
+        "updated_at": "2025-03-15T03:20:32.000000Z",
+        "created_at": "2025-03-15T03:20:32.000000Z",
+        "id": 2
+    }
+    ```
+
+    **Method**:GET
+    **URL**:/admin/sesi_ujian
+    **Response**:
+    ```json
+    {
+        "current_page": 1,
+        "data": [
+            {
+                "id": 1,
+                "nama":"VII",
+                "created_at": "2025-03-05T08:36:54.000000Z",
+                "updated_at": "2025-03-05T08:36:54.000000Z"
+            },
+            {
+                "id": 2,
+                "nama":"VII",
+                "created_at": "2025-03-15T03:00:30.000000Z",
+                "updated_at": "2025-03-15T03:00:30.000000Z"
+            }
+        ],
+        "first_page_url": "http://127.0.0.1:8000/api/admin/sesi_ujian?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "http://127.0.0.1:8000/api/admin/sesi_ujian?page=1",
+        "links": [
+            {
+                "url": null,
+                "label": "&laquo; Previous",
+                "active": false
+            },
+            {
+                "url": "http://127.0.0.1:8000/api/admin/sesi_ujian?page=1",
+                "label": "1",
+                "active": true
+            },
+            {
+                "url": null,
+                "label": "Next &raquo;",
+                "active": false
+            }
+        ],
+        "next_page_url": null,
+        "path": "http://127.0.0.1:8000/api/admin/sesi_ujian",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 2,
+        "total": 2
+    }
+    ```
+
+    **Method**:PUT
+    **URL**:/admin/sesi_ujian/{id}
+    **Body**:
+    ```json
+    {
+        "nama":"VII"
+    }
+    ```
+    **Response**:
+    ```json
+    {
+        "nama":"VII",
+        "updated_at": "2025-03-15T03:00:30.000000Z",
+        "created_at": "2025-03-15T03:00:30.000000Z",
+        "id": 2
+    }
+    ```
+
+    **Method**:DELETE
+    **URL**:/admin/sesi_ujian/{id}
     **Response**:
     ```json
     {

@@ -21,7 +21,13 @@ Route::prefix("/admin")->group(function () {
     Route::post("/logout", [AuthController::class, "guruLogout"]);
 
     Route::middleware([JwtMiddleware::class])->group(function(){
-        
+        // Peserta
+        Route::get("/peserta", [PesertaController::class, "index"]);
+        Route::get("/peserta/{id}", [PesertaController::class, "show"]);
+        Route::post("/peserta", [PesertaController::class, "store"]);
+        Route::put("/peserta/{id}", [PesertaController::class, "update"]);
+        Route::delete("/peserta/{id}", [PesertaController::class, "destroy"]);
+
         // Agama
         Route::get("/agama", [AgamaController::class, "index"]);
         Route::get("/agama/{id}", [AgamaController::class, "show"]);
