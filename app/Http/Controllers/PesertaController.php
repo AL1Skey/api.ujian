@@ -83,6 +83,7 @@ class PesertaController extends Controller
     /**
      * Display the specified resource.
      */
+
     public function show($id)
     {
         //
@@ -149,6 +150,19 @@ class PesertaController extends Controller
             $peserta = Peserta::findOrFail($id);
             $peserta->delete();
             return response()->json(["message" => "Peserta deleted successfully"]);
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
+    }
+
+    public function getSelf(Request $request)
+    {
+        try {
+            $peserta = $request->attributes->get('jwt_payload');
+            $peserta->load("jurusan");
+            $peserta->load("agama");
+            $peserta->load("kelas");
+            return response()->json($peserta);
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
         }

@@ -13,6 +13,8 @@ use App\Http\Controllers\SesiSoalController;
 use App\Http\Controllers\SoalController;
 use App\Http\Controllers\UjianController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\NilaiUjianController;
+use App\Http\Controllers\HasilUjianController;
 use App\Http\Middleware\JwtMiddleware;
 
 Route::prefix("/admin")->group(function () {
@@ -105,7 +107,12 @@ Route::prefix("/admin")->group(function () {
         Route::put("/daftar_kelas/{id}", [DaftarKelasController::class, "update"]);
         Route::delete("/daftar_kelas/{id}", [DaftarKelasController::class, "destroy"]);
 
+        // Nilai Ujian
+        Route::get("/nilai_ujian", [NilaiUjianController::class, "index"]);
 
+        // Hasil Ujian
+        Route::get("/hasil_ujian", [HasilUjianController::class, "index"]);
+        Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);
     });
 
     Route::prefix("/public")->group(function(){
@@ -131,7 +138,7 @@ Route::prefix("/siswa")->group(function(){
     Route::post("/logout", [AuthController::class, "pesertaLogout"]);
 
     Route::middleware([JwtMiddleware::class])->group(function(){
-        Route::get("/peserta", [PesertaController::class, "index"]);
+        Route::get("/peserta", [PesertaController::class, "getSelf"]);
         
         Route::get("/ujian", [UjianController::class, "index"]);
         Route::get("/sesi_ujian", [SesiUjianController::class, "index"]);

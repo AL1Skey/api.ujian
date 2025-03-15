@@ -20,6 +20,11 @@ class Sesi_Ujian extends Model
         return $ujian;
     }
 
+    public function sesi_soal()
+    {
+        return $this->hasMany(Sesi_Soal::class, 'sesi_ujian_id', 'id');
+    }
+
     public function peserta()
     {
         return $this->belongsTo(Peserta::class, 'nomor_peserta', 'nomor_peserta');

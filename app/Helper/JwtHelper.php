@@ -15,7 +15,7 @@ class JwtHelper
      * @param  int    $expiresIn  Token expiration in seconds (default 3600 seconds)
      * @return string
      */
-    public static function generateToken(array $payload, int $expiresIn = 3600): string
+    public static function generateToken(array $payload, int $expiresIn = 19200): string
     {
         $secretKey = env('JWT_SECRET');
 

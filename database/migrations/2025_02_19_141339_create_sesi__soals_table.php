@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->foreign('soal_id')->references('id')->on('soals')->nullOnDelete()->cascadeOnUpdate();
             $table->string('tipe_soal')->nullable();
             $table->string('jawaban')->nullable();
+            $table->bool('isTrue')->nullable();
             $table->timestamps();
         });
     }

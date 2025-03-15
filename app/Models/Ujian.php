@@ -20,6 +20,19 @@ class Ujian extends Model
         return $this->belongsTo('App\Models\Mapel','mapel_id');
     }
 
+    public function sesi_ujian()
+    {
+        $data= $this->hasMany('App\Models\Sesi_Ujian','ujian_id');
+        $data->with('sesi_soal');
+        return $data;   
+    }
+
+
+    public function soal()
+    {
+        return $this->hasMany('App\Models\Soal','ujian_id');
+    }
+
     public function kelas()
     {
         return $this->belongsTo('App\Models\Daftar_Kelas','kelas_id');

@@ -48,7 +48,7 @@ trait AuthGuruTrait
             }
             $data = $guru->toArray();
             $data['password'] = $credentials['password'];
-            $token = JwtHelper::generateToken($data, 3600);
+            $token = JwtHelper::generateToken($data, 19200);
 
             return response()->json(compact('guru', 'token'), 200);
 
@@ -108,28 +108,30 @@ trait AuthPesertaTrait
                 "password"=> "required",
             ]);
             $credentials = $request->only('nomor_peserta', 'password');
-
             $peserta = Peserta::where('nomor_peserta', $credentials['nomor_peserta'])->first();
-
+            
             if (!$peserta) {
                 return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
             }
-
-            $verifyPassword = Hash::check($credentials['password'], $peserta->password);
-
-            if(!$verifyPassword) {
-                return response()->json(['error'=> 'invalid_credentials'],400);
+            
+            // dd($peserta->password);
+            if(!($peserta->password == $credentials['password'])) {
+                $verifyPassword = Hash::check($credentials['password'], $peserta->password);
+    
+                if(!$verifyPassword) {
+                    return response()->json(['error'=> 'invalid_credentials'],400);
+                }
             }
             $data = $peserta->toArray();
             $data['password'] = $credentials['password'];
-            $token = JwtHelper::generateToken($data, 3600);
+            $token = JwtHelper::generateToken($data, 19200);
 
             return response()->json(compact('peserta', 'token'), 200);
 
 
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'could_not_create_token'], 500);
+            return response()->json(['error' => 'could_not_create_token','err'=>$e->getMessage()], 500);
         }
     }
 
