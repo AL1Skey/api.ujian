@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('hasil__ujians', function (Blueprint $table) {
             $table->id();
             $table->string('nomor_peserta')->nullable();
-            $table->string('ujian_id')->nullable();
+            
+            $table->unsignedBigInteger('ujian_id')->nullable();
             $table->foreign('ujian_id')->references('id')->on('ujians')->nullOnDelete()->cascadeOnUpdate();
-            $table->string('soal_id')->nullable();
+        
+            $table->unsignedBigInteger('soal_id')->nullable();
             $table->foreign('soal_id')->references('id')->on('soals')->nullOnDelete()->cascadeOnUpdate();
-            $table->string('sesi_soal_id')->nullable();
+
+            $table->unsignedBigInteger('sesi_soal_id')->nullable();
             $table->foreign('sesi_soal_id')->references('id')->on('sesi__soals')->nullOnDelete()->cascadeOnUpdate();
             $table->boolean('isTrue')->nullable();
             $table->timestamps();

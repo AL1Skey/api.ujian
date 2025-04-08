@@ -15,11 +15,12 @@ class GuruController extends Controller
         //
         try {
             $guru = Guru::query();
+            $per_page = $request->query("limit") ?? 10;
             if ($request->query('search')) {
                 $guru->where('nama', 'like', '%' . $request->query('search') . '%');
             }
             $guru->with('mapel');
-            return response()->json($guru->paginate(10));
+            return response()->json($guru->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

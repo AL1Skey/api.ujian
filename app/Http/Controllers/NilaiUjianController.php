@@ -19,12 +19,13 @@ class NilaiUjianController extends Controller{
         // // $ujian->with('sesi_soal');
         // $ujian->with('soal');
         // $ujian->groupBy('nomor_peserta','sesi_soal');
+        $per_page = $request->query("limit") ?? 10;
         $ujian->select('peserta.nama', 'soal.soal', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi')
               ->join('Soals as soal', 'Ujians.id', '=', 'soal.ujian_id')
               ->join('Sesi__Ujians as sesi_ujian','Ujians.id','=','sesi_ujian.ujian_id')
               ->join('Sesi__Soals as sesi_soal', 'sesi_ujian.id', '=', 'sesi_soal.sesi_ujian_id')
               ->join('Pesertas as peserta', 'sesi_ujian.nomor_peserta', '=', 'peserta.nomor_peserta');
-        return response()->json($ujian->paginate(10));
+        return response()->json($ujian->paginate($per_page));
     }
 
 }

@@ -27,8 +27,8 @@ class UjianController extends Controller
             $ujian->with("kelompok_ujian");
             $ujian->with("mapel");
             $ujian->with("kelas");
-
-            return response()->json($ujian->paginate(10));
+            $per_page = $request->query("limit") ?? 10;
+            return response()->json($ujian->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
         }

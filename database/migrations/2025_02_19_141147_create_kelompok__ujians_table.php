@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('id_sekolah')->nullable();
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();
+            // $table->boolean('isDeleted')->default(false);
             $table->timestamps();
         });
     }

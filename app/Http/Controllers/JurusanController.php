@@ -15,10 +15,11 @@ class JurusanController extends Controller
         //
         try {
             $jurusan = Jurusan::query();
+            $per_page = $request->query("limit") ?? 10;
             if ($request->query('search')) {
                 $jurusan->where('nama', 'like', '%' . $request->query('search') . '%');
             }
-            return response()->json($jurusan->paginate(10));
+            return response()->json($jurusan->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()

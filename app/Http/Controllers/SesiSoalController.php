@@ -15,10 +15,13 @@ class SesiSoalController extends Controller
         //
         try {
             $soal = Sesi_Soal::query();
-            if ($request->query('search')) {
-                $soal->where('nama', 'like', '%' . $request->query('search') . '%');
+            if ($request->query('nomor_peserta')) {
+                $soal->where('nomor_peserta', 'like', '%' . $request->query('nomor_peserta') . '%');
             }
-            $soal->with('sesi_ujian');
+            if($request->query('ujian_id')){
+                $soal->where('ujian_id', 'like', '%' . $request->query('ujian_id') . '%');
+            }
+            $soal->with('ujian');
             $soal->with('soal');
             $soal->with('peserta');
             return response()->json($soal->paginate(10));
@@ -36,7 +39,7 @@ class SesiSoalController extends Controller
         //
         try {
             $request->validate([
-                'sesi_ujian_id' => 'required|integer',
+                'ujian_id' => 'required|integer',
                 'soal_id' => 'required|integer',
                 'nomor_peserta' => 'required|integer',
                 'jawaban' => 'string',
@@ -58,7 +61,7 @@ class SesiSoalController extends Controller
         //
         try {
             $soal = Sesi_Soal::findOrFail($id);
-            $soal->load('sesi_ujian');
+            $soal->load('ujian');
             $soal->load('soal');
             $soal->load('peserta');
             return response()->json($soal);
@@ -76,7 +79,7 @@ class SesiSoalController extends Controller
         //
         try {
             $request->validate([
-                'sesi_ujian_id' => 'integer',
+                'ujian_id' => 'integer',
                 'soal_id' => 'integer',
                 'nomor_peserta' => 'integer',
                 'jawaban' => 'string',

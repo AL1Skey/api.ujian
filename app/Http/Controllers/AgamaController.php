@@ -16,10 +16,11 @@ class AgamaController extends Controller
         //
         try {
             $agama = Agama::query();
+            $per_page = $request->query("limit") ?? 10;
             if ($request->query('search')) {
                 $agama->where('nama', 'like', '%' . $request->query('search') . '%');
             }
-            return response()->json($agama->paginate(10));
+            return response()->json($agama->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

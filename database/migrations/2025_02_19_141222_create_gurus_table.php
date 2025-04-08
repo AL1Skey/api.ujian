@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->boolean('is_active')->default(true);
             $table->unsignedBigInteger('agama_id')->nullable();
             $table->foreign('agama_id')->references('id')->on('agamas')->nullOnDelete()->cascadeOnUpdate();
+            $table->boolean('isDeleted')->default(false);
             $table->timestamps();
         });
     }

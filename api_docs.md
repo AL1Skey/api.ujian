@@ -1426,3 +1426,111 @@
         "message": "Data deleted"
     }
     ```
+
+-   ### Submit Ujian
+    **Method**:POST  
+    **URL**:/api/submit-ujian  
+    **Body**:  
+    ```json
+    {
+        "data": [
+            {
+                "ujian_id": 1,
+                "nomor_peserta": "210425",
+                "soal_id": 1,
+                "tipe_soal": "pilihan_ganda",
+                "jawaban": "Jakarta"
+            },
+            {
+                "ujian_id": 1,
+                "nomor_peserta": "210425",
+                "soal_id": 2,
+                "tipe_soal": "essay",
+                "jawaban": "Ibu kota Indonesia adalah Jakarta."
+            }
+        ]
+    }
+    ```  
+    **Response**:  
+    ```json
+    {
+        "message": "Answers submitted successfully."
+    }
+    ```  
+
+    **Error Responses**:  
+
+    - **Validation Error**:  
+        ```json
+        {
+            "error": "The data field is required."
+        }
+        ```  
+
+    - **Data Not Found**:  
+        ```json
+        {
+            "error": "Data not found"
+        }
+        ```  
+
+    - **Server Error**:  
+        ```json
+        {
+            "error": "An error message describing the issue."
+        }
+        ```
+-   ### Get Hasil Ujian
+    **Method**: GET  
+    **URL**: /admin/hasil_ujian  
+    **Query Parameters**:  
+    - `limit` (optional): Number of results per page. Default is 10.  
+
+    **Response**:  
+    ```json
+    {
+        "current_page": 1,
+        "data": [
+            {
+                "nama": "Adit",
+                "ujian_id": 1,
+                "soal": "Apa ibu kota Indonesia?",
+                "jawaban_soal": "Jakarta",
+                "jawaban_sesi": "Jakarta",
+                "isTrue": true
+            }
+        ],
+        "first_page_url": "http://127.0.0.1:8000/api/admin/hasil_ujian?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "http://127.0.0.1:8000/api/admin/hasil_ujian?page=1",
+        "next_page_url": null,
+        "path": "http://127.0.0.1:8000/api/admin/hasil_ujian",
+        "per_page": 10,
+        "prev_page_url": null,
+        "to": 1,
+        "total": 1
+    }
+    ```
+
+-   ### Reevaluate Hasil Ujian
+    **Method**: POST  
+    **URL**: /admin/hasil_ujian/reevaluate  
+
+    **Response**:  
+    ```json
+    {
+        "message": "Hasil ujian reevaluated successfully."
+    }
+    ```
+
+-   ### Migrate Hasil Ujian
+    **Method**: POST  
+    **URL**: /admin/hasil_ujian/migrate  
+
+    **Response**:  
+    ```json
+    {
+        "message": "Hasil ujian migrated successfully."
+    }
+    ```

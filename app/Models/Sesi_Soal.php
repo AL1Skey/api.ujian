@@ -8,11 +8,11 @@ class Sesi_Soal extends Model
 {
     //
     protected $table = 'sesi__soals';
-    protected $fillable = ['sesi_ujian_id', 'nomor_peserta', 'soal_id', 'tipe_soal','jawaban'];
+    protected $fillable = ['ujian_id', 'nomor_peserta', 'soal_id', 'tipe_soal','jawaban'];
 
-    public function sesi_ujian()
+    public function ujian()
     {
-        return $this->belongsTo(Sesi_Ujian::class);
+        return $this->belongsTo(Ujian::class);
     }
 
     public function soal()

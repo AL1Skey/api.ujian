@@ -14,11 +14,12 @@ class KelompokUjianController extends Controller
     {
         //
         try {
+            $per_page = $request->query("limit") ?? 10;
             $kelompok_ujian = Kelompok_Ujian::query();
             if ($request->query('search')) {
                 $kelompok_ujian->where('nama', 'like', '%' . $request->query('search') . '%');
             }
-            return response()->json($kelompok_ujian->paginate(10));
+            return response()->json($kelompok_ujian->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

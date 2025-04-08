@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreign('jurusan_id')->references('id')->on('jurusans');
             $table->unsignedBigInteger('agama_id')->nullable();
             $table->foreign('agama_id')->references('id')->on('agamas');
+            // $table->boolean('isDeleted')->default(false);
             $table->timestamps();
         });
     }

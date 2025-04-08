@@ -14,11 +14,11 @@ class DaftarKelasController extends Controller
     {
         //
         $kelas = Daftar_Kelas::query();
-
+        $per_page = $request->query("limit") ?? 10;
         if ($request->query('nama')) {
             $kelas->where('nama', 'like', '%' . $request->query('nama') . '%');
         }
-        return response()->json($kelas->paginate(10));
+        return response()->json($kelas->paginate($per_page));
     }
 
     /**

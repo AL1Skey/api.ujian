@@ -14,11 +14,12 @@ class MapelController extends Controller
     {
         //
         try{
+            $per_page = $request->query("limit") ?? 10;
             $mapel = Mapel::query();
             if($request->query("search")){
                 $mapel->where("nama", "like", "%" . $request->query("search") . "%");
             }
-            return response()->json($mapel->paginate(10));
+            return response()->json($mapel->paginate($per_page));
         }
         catch(\Exception $e){
             return response()->json(["error" => $e->getMessage()], 400);

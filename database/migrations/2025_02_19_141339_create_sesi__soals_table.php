@@ -12,17 +12,22 @@ return new class extends Migration {
     {
         Schema::create('sesi__soals', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('sesi_ujian_id')->nullable();
-            $table->foreign('sesi_ujian_id')->references('id')->on('sesi__ujians')->nullOnDelete()->cascadeOnUpdate();
+            
             $table->unsignedBigInteger('nomor_peserta')->nullable();
             $table->foreign('nomor_peserta')->references('nomor_peserta')->on('pesertas')->nullOnDelete()->cascadeOnUpdate();
-            $table->unsignedBigInteger('soal_id');
+            
+            $table->unsignedBigInteger('ujian_id')->nullable();
+            $table->foreign('ujian_id')->references('id')->on('ujians')->nullOnDelete()->cascadeOnUpdate();
+        
+            $table->unsignedBigInteger('soal_id')->nullable();
             $table->foreign('soal_id')->references('id')->on('soals')->nullOnDelete()->cascadeOnUpdate();
+        
             $table->string('tipe_soal')->nullable();
             $table->string('jawaban')->nullable();
-            $table->bool('isTrue')->nullable();
+            $table->boolean('isTrue')->nullable();
             $table->timestamps();
         });
+        
     }
 
     /**

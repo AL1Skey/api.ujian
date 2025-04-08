@@ -20,7 +20,8 @@ class SoalController extends Controller
                 $soal->where("ujian_id", "like", "%" . $request->query("ujian") . "%");
             }
             $soal->with("ujian");
-            return response()->json($soal->paginate(100));
+            $per_page = $request->query("limit") ?? 100;
+            return response()->json($soal->paginate($per_page));
         }
         catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
