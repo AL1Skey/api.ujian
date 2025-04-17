@@ -19,7 +19,17 @@ class KelompokUjianController extends Controller
             if ($request->query('search')) {
                 $kelompok_ujian->where('nama', 'like', '%' . $request->query('search') . '%');
             }
+<<<<<<< HEAD
+            $result = $kelompok_ujian->paginate($per_page);
+            $result->getCollection()->transform(function ($item) {
+                $item->start_date = $item->start_date ? \Carbon\Carbon::parse($item->start_date)->toIso8601String() : null;
+                $item->end_date = $item->end_date ? \Carbon\Carbon::parse($item->end_date)->toIso8601String() : null;
+                return $item;
+            });
+            return response()->json($result);
+=======
             return response()->json($kelompok_ujian->paginate($per_page));
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }
@@ -55,6 +65,8 @@ class KelompokUjianController extends Controller
         try {
             $kelompok_ujian = Kelompok_Ujian::find($id);
             if ($kelompok_ujian) {
+                $kelompok_ujian->start_date = $kelompok_ujian->start_date ? \Carbon\Carbon::parse($kelompok_ujian->start_date)->toIso8601String() : null;
+                $kelompok_ujian->end_date = $kelompok_ujian->end_date ? \Carbon\Carbon::parse($kelompok_ujian->end_date)->toIso8601String() : null;
                 return response()->json($kelompok_ujian);
             }
             return response()->json(['message' => 'Data not found'], 404);

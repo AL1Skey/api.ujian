@@ -16,15 +16,25 @@ class SesiSoalController extends Controller
         try {
             $soal = Sesi_Soal::query();
             if ($request->query('nomor_peserta')) {
+<<<<<<< HEAD
+                $soal->where('nomor_peserta',$request->query('nomor_peserta'));
+            }
+            if($request->query('ujian_id')){
+                $soal->where('ujian_id', $request->query('ujian_id'));
+            }
+            $limit = $request->query('limit') ?? 100;
+=======
                 $soal->where('nomor_peserta', 'like', '%' . $request->query('nomor_peserta') . '%');
             }
             if($request->query('ujian_id')){
                 $soal->where('ujian_id', 'like', '%' . $request->query('ujian_id') . '%');
             }
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
             $soal->with('ujian');
             $soal->with('soal');
             $soal->with('peserta');
-            return response()->json($soal->paginate(10));
+            
+            return response()->json($soal->paginate($limit));
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['error' => $th->getMessage()], 400);
@@ -45,6 +55,31 @@ class SesiSoalController extends Controller
                 'jawaban' => 'string',
             ]);
             $data = $this->handleRequest($request);
+            $soal = Sesi_Soal::create($data);
+            return response()->json($soal, 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error' => $th->getMessage()], 400);
+        }
+    }
+    
+    
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function upstore(Request $request)
+    {
+        //
+        try {
+            $request->validate([
+                'ujian_id' => 'required|integer',
+                'soal_id' => 'required|integer',
+                'nomor_peserta' => 'required|integer',
+                'jawaban' => 'string',
+            ]);
+            $data = $this->handleRequest($request);
+            $soalId = Sesi_Soal::query();
+            $soalId = $soalId->where('ujian_id',$request->ujian_id)->where('soal_id',$request->soal_id)->where('nomor_peserta',$request->nomor_peserta);
             $soal = Sesi_Soal::create($data);
             return response()->json($soal, 201);
         } catch (\Throwable $th) {

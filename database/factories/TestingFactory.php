@@ -64,6 +64,19 @@ class TestingFactory extends Factory
             'updated_at'  => now(),
         ];
     }
+<<<<<<< HEAD
+    // Factory for table: sesi_ujians
+    public function sesiUjian(): array
+    {
+        return [
+            'ujian_id'      => $this->faker->numberBetween(1, 100),
+            'nomor_peserta' => $this->faker->numberBetween(1000, 9999),
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ];
+    }
+=======
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
 
     // Factory for table: gurus
     public function guru(): array
@@ -90,7 +103,11 @@ class TestingFactory extends Factory
             'ujian_id'    => $this->faker->numberBetween(1, 100),
             'soal'        => $this->faker->text,
             'image'       => $this->faker->imageUrl,
+<<<<<<< HEAD
+            'tipe_soal'   => $this->faker->randomElement(['pilihan_ganda', 'essai']),
+=======
             'tipe_soal'   => $this->faker->word,
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
             'pilihan_a'   => $this->faker->word,
             'pilihan_b'   => $this->faker->word,
             'pilihan_c'   => $this->faker->word,
@@ -305,6 +322,19 @@ class TestingFactory extends Factory
     });
     
 
+<<<<<<< HEAD
+    // Generate Sesi Ujian records
+    collect(range(1, $count))->each(function () use ($ujianIds, $pesertaIds) {
+        \DB::table('sesi__ujians')->insert(
+            array_merge($this->sesiUjian(), [
+                'ujian_id'      => fake()->randomElement($ujianIds),
+                'nomor_peserta' => fake()->randomElement($pesertaIds),
+            ])
+        );
+    });
+
+=======
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
     // Optional lainnya
     \DB::table('users')->insert(
         collect(range(1, $count))->map(fn () => $this->user())->toArray()
@@ -312,4 +342,8 @@ class TestingFactory extends Factory
 }
 
 
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d

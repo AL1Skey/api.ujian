@@ -8,7 +8,7 @@ class Sesi_Ujian extends Model
 {
     //
     protected $table = 'sesi__ujians';
-    protected $fillable = ['ujian_id','nomor_peserta'];
+    protected $fillable = ['id','ujian_id','nomor_peserta','isTrue'];
 
     public function ujian()
     {

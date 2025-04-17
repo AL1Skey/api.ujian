@@ -15,20 +15,115 @@ class UjianController extends Controller
      */
     public function index(Request $request)
     {
-        //
-        //
         try {
             $ujian = Ujian::query();
 
             if ($request->query("id_sekolah")) {
                 $ujian->where("id_sekolah", "like", "%" . $request->query("id_sekolah") . "%");
             }
+            if ($request->query("kelompok_id")) {
+                $ujian->where("kelompok_id", $request->query("kelompok_id"));
+            }
+            if ($request->query("status")) {
+                $ujian->where("status", $request->query("status"));
+            }
+            
+            if ($request->query('mapel_id')){
+                $ujian->where('mapel_id',$request->query('mapel_id'));
+            }
 
             $ujian->with("kelompok_ujian");
             $ujian->with("mapel");
             $ujian->with("kelas");
+<<<<<<< HEAD
+
+            // Convert start_date and end_date to ISO format
+            $ujian->get()->transform(function ($item) {
+                $item->start_date = \Carbon\Carbon::parse($item->start_date)->toIso8601String();
+                $item->end_date = \Carbon\Carbon::parse($item->end_date)->toIso8601String();
+                return $item;
+            });
+
             $per_page = $request->query("limit") ?? 10;
             return response()->json($ujian->paginate($per_page));
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
+    }
+
+    public function indexSiswa(Request $request){
+        try {
+            $ujian = Ujian::query();
+            $ujian->leftJoin('sesi__ujians', 'ujians.id', '=', 'sesi__ujians.ujian_id')
+                  ->select('ujians.*'); // Explicitly select columns from ujians
+    
+            // Existing query conditions...
+            if ($request->query("id_sekolah")) {
+                $ujian->where("id_sekolah", "like", "%" . $request->query("id_sekolah") . "%");
+            }
+            if ($request->query("nomor_peserta")) {
+                $ujian->where("sesi__ujians.nomor_peserta", $request->query("nomor_peserta"));
+            }
+            if ($request->query("ujian_id")) {
+                $ujian->where("ujians.id", $request->query("ujian_id"));
+            }
+            if($request->query("kelompok_id")){
+                $ujian->where("ujians.kelompok_id",$request->query("kelompok_id"));
+            }
+            if ($request->query('mapel_id')){
+                $ujian->where('mapel_id',$request->query('mapel_id'));
+            }
+    
+            $ujian->with("kelompok_ujian");
+            $ujian->with("mapel");
+            $ujian->with("kelas");
+    
+            // Date transformation remains the same
+            $ujian->get()->transform(function ($item) {
+                $item->start_date = \Carbon\Carbon::parse($item->start_date)->toIso8601String();
+                $item->end_date = \Carbon\Carbon::parse($item->end_date)->toIso8601String();
+                return $item;
+            });
+    
+            $per_page = $request->query("limit") ?? 10;
+            return response()->json($ujian->paginate($per_page));
+        } catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Display all IDs of the resource.
+     */
+    public function getAllIds(Request $request)
+    {
+        //
+        // Display all IDs of the resource
+        // This method is used to get all IDs of the Ujian model
+        // It returns a JSON response with the IDs
+        // Example: GET /api/ujian/ids
+        try {
+            $data = Ujian::query();
+            if ($request->query("start_date")) {
+                $data->where("start_date", ">=", $request->query("start_date"));
+            }
+            if ($request->query("end_date")) {
+                $data->where("end_date", "<=", $request->query("end_date"));
+            }
+
+            // Convert start_date and end_date to ISO format
+            $data->get()->transform(function ($item) {
+                $item->start_date = \Carbon\Carbon::parse($item->start_date)->toIso8601String();
+                $item->end_date = \Carbon\Carbon::parse($item->end_date)->toIso8601String();
+                return $item;
+            });
+
+            $ids = $data->pluck('id');
+            return response()->json($ids);
+=======
+            $per_page = $request->query("limit") ?? 10;
+            return response()->json($ujian->paginate($per_page));
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
         }
@@ -84,6 +179,11 @@ class UjianController extends Controller
             $ujian->load("kelompok_ujian");
             $ujian->load("mapel");
             $ujian->load("kelas");
+
+            // Convert start_date and end_date to ISO format
+            $ujian->start_date = \Carbon\Carbon::parse($ujian->start_date)->toIso8601String();
+            $ujian->end_date = \Carbon\Carbon::parse($ujian->end_date)->toIso8601String();
+
             return response()->json($ujian);
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);

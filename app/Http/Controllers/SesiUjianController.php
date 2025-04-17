@@ -17,11 +17,11 @@ class SesiUjianController extends Controller
         //
         try{
             $sesi_ujian = Sesi_Ujian::query();
-            if($request->query("ujian")){
-                $sesi_ujian->where("ujian_id", "like", "%" . $request->query("ujian") . "%");
+            if($request->query("ujian_id")){
+                $sesi_ujian->where("ujian_id",  $request->query("ujian_id"));
             }
-            if($request->query("peserta")){
-                $sesi_ujian->where("nomor_peserta", "like", "%" . $request->query("peserta") . "%");
+            if($request->query("nomor_peserta")){
+                $sesi_ujian->where("nomor_peserta", $request->query("nomor_peserta"));
             }
             $sesi_ujian->with("ujian");
             

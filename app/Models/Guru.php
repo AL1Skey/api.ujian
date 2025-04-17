@@ -26,7 +26,7 @@ class Guru extends Model implements
     protected $table = 'gurus';
 
     // Define the attributes that are mass assignable
-    protected $fillable = ['username', 'password', 'nama', 'alamat', 'mapel_id', 'is_active', 'agama_id'];
+    protected $fillable = ['username', 'password', 'nama', 'alamat','role', 'mapel_id', 'is_active', 'agama_id'];
 
     protected $hidden = [
         'password',

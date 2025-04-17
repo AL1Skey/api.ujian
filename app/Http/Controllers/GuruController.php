@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Guru;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Hash;
 class GuruController extends Controller
 {
     /**
@@ -19,6 +19,10 @@ class GuruController extends Controller
             if ($request->query('search')) {
                 $guru->where('nama', 'like', '%' . $request->query('search') . '%');
             }
+            if ($request->query('id')) {
+                $guru->where('id', $request->query('id'));
+            }
+            
             $guru->with('mapel');
             return response()->json($guru->paginate($per_page));
         } catch (\Exception $e) {
@@ -42,7 +46,9 @@ class GuruController extends Controller
                 'is_active' => 'boolean',
                 'agama_id' => 'integer',
             ]);
+            
             $data = $this->handleRequest($request);
+            $data['password'] = Hash::make($data['password']);
             $guru = Guru::create($data);
             return response()->json($guru, 201);
         } catch (\Exception $e) {
@@ -75,7 +81,7 @@ class GuruController extends Controller
         try {
             $request->validate([
                 'username' => 'required|string',
-                'password' => 'required|string',
+                //'password' => 'required|string',
                 'nama' => 'required|string',
                 'alamat' => 'string',
                 'mapel_id' => 'integer',
@@ -84,6 +90,7 @@ class GuruController extends Controller
             ]);
             $data = $this->handleRequest($request);
             $guru = Guru::find($id);
+            $data['password'] = Hash::make($data['password']);
             $guru->update($data);
             return response()->json([
                 'message' => 'Data updated',

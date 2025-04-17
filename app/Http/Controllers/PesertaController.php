@@ -19,8 +19,8 @@ class PesertaController extends Controller
         //
         try{
             $peserta = Peserta::query();
-            if($request->query("search")){
-                $peserta->where("nama", "like", "%" . $request->query("search") . "%");
+            if($request->query("nomor_peserta")){
+                $peserta->where("nomor_peserta", $request->query("nomor_peserta") );
             }
             $peserta->with("jurusan");
             $peserta->with("agama");
@@ -42,7 +42,7 @@ class PesertaController extends Controller
         try{
             $request->validate([
                 "nama" => "required",
-                // "nomor_peserta" => "required",
+                "nomor_peserta" => "required",
                 "password" => "required",
                 "alamat" => "string",
                 "jurusan_id" => "integer",
@@ -63,14 +63,28 @@ class PesertaController extends Controller
             if(!$checkKelas){
                 $data['kelas_id'] = null;
             }
-            while (True){
+            if($request->nomor_peserta){
+                $nomor_peserta = $request->nomor_peserta;
+                $check_peserta = Peserta::query()->where("nomor_peserta", $nomor_peserta)->first();
+                
+                if(!$check_peserta){
+                    $data['nomor_peserta'] = $nomor_peserta;
+                }
+                else{
+                    return response()->json(["error"=>"Nomor Peserta cannot be duplicated"]);
+                }
+            }
+            else{
+                while (True){
                 $nomor_peserta = rand(100000, 999999);
                 $check_peserta = Peserta::query()->where("nomor_peserta", $nomor_peserta)->first();
                 if(!$check_peserta){
                     $data['nomor_peserta'] = $nomor_peserta;
                     break;
-                }
+                    }
+                }    
             }
+            
             $data['password'] = Hash::make($data['password']);
             $peserta = Peserta::create($data);
             return response()->json($peserta, 201);

@@ -12,6 +12,16 @@ use App\Models\Sesi_Soal;
 class UjianController extends Controller
 {
     //
+<<<<<<< HEAD
+    public function submitUjian(Request $request){
+        try{
+            $request->validate([
+                'data' => 'required|array',
+                'data.*' => 'required|array',
+                'data.*.ujian_id' => 'required|integer',
+                'data.*.nomor_peserta' => 'required|string',
+                'data.*.soal_id' => 'required|integer',
+=======
     /**
      * @api {post} /api/v1/submit-ujian Submit Ujian
      * @apiName SubmitUjian
@@ -58,6 +68,7 @@ class UjianController extends Controller
             'data.*.ujian_id' => 'required|integer',
             'data.*.nomor_peserta' => 'required|string',
             'data.*.soal_id' => 'required|integer',
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
             ]);
             $bodyData = [];
             if($request->has('data')){
@@ -65,6 +76,26 @@ class UjianController extends Controller
             }
             if(count($bodyData) > 0){
                 foreach($bodyData as $data){
+<<<<<<< HEAD
+                    $checkSesiSoal = Sesi_Soal::where('ujian_id', $data['ujian_id'])
+                        ->where('nomor_peserta', $data['nomor_peserta'])
+                        ->where('soal_id', $data['soal_id'])
+                        ->where('tipe_soal', $data['tipe_soal'])
+                        ->first();
+                
+                    if($checkSesiSoal){
+                        $checkSesiSoal->update([
+                            'jawaban' => $data['jawaban'],
+                        ]);
+                    }else{
+                        Sesi_Soal::create([
+                            'ujian_id' => $data['ujian_id'],
+                            'nomor_peserta' => $data['nomor_peserta'],
+                            'soal_id' => $data['soal_id'],
+                            'tipe_soal' => $data['tipe_soal'],
+                            'jawaban' => $data['jawaban'],
+                        ]);
+=======
                     $checkSesiSoal = Sesi_Soal::where('ujian_id', $data->ujian_id)
                         ->where('nomor_peserta', $data->nomor_peserta)
                         ->where('soal_id', $data->soal_id)
@@ -82,11 +113,16 @@ class UjianController extends Controller
                         'tipe_soal' => $data->tipe_soal,
                         'jawaban' => $data->jawaban,
                     ]);
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
                     }
                 }
             }else{
                 return response()->json(['error' => 'Data not found'], 404);
             }
+<<<<<<< HEAD
+            return response()->json(['msg'=>"Data Has Been Successfully inserted"],201);
+=======
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         }
         catch(\Exception $e){
             return response()->json(['error' => $e->getMessage()], 400);

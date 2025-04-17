@@ -19,6 +19,12 @@ class JurusanController extends Controller
             if ($request->query('search')) {
                 $jurusan->where('nama', 'like', '%' . $request->query('search') . '%');
             }
+<<<<<<< HEAD
+            if ($request->query('jurusan_id')){
+                $jurusan->where('id',$request->query('jurusan_id'));
+            }
+=======
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
             return response()->json($jurusan->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json([

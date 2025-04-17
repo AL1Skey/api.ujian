@@ -12,8 +12,14 @@ use App\Http\Controllers\SesiSoalController;
 use App\Http\Controllers\SoalController;
 use App\Http\Controllers\UjianController;
 use App\Http\Controllers\AuthController;
+<<<<<<< HEAD
+// use App\Http\Controllers\NilaiUjianController;
+use App\Http\Controllers\HasilUjianController;
+use App\Http\Controllers\SesiUjianController;
+=======
 use App\Http\Controllers\NilaiUjianController;
 use App\Http\Controllers\HasilUjianController;
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
 use App\Http\Middleware\JwtMiddleware;
 
 
@@ -21,7 +27,13 @@ Route::prefix("/admin")->group(function () {
     Route::post("/login", [AuthController::class, "guruLogin"]);
     Route::post("/register", [AuthController::class, "guruRegister"]);
     Route::post("/logout", [AuthController::class, "guruLogout"]);
+<<<<<<< HEAD
+    
+    //middleware([JwtMiddleware::class])->
+    // Route::group([],function(){
+=======
 
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
     Route::middleware([JwtMiddleware::class])->group(function(){
         // Peserta
         Route::get("/peserta", [PesertaController::class, "index"]);
@@ -80,7 +92,11 @@ Route::prefix("/admin")->group(function () {
         Route::delete("/sesi_soal/{id}", [SesiSoalController::class, "destroy"]);
 
         // Soal
+<<<<<<< HEAD
+        Route::get("/soal", [SoalController::class, "indexAll"]);
+=======
         Route::get("/soal", [SoalController::class, "index"]);
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         Route::get("/soal/{id}", [SoalController::class, "show"]);
         Route::post("/soal", [SoalController::class, "store"]);
         Route::put("/soal/{id}", [SoalController::class, "update"]);
@@ -88,7 +104,12 @@ Route::prefix("/admin")->group(function () {
 
         // Ujian
         Route::get("/ujian", [UjianController::class, "index"]);
+<<<<<<< HEAD
+        Route::get("/ujian_ids", [UjianController::class, "getAllIds"]);
+        Route::get("/ujian/{id}", [UjianController::class, "show"]);
+=======
         Route::get("/ujian/edit/{id}", [UjianController::class, "show"]);
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         Route::post("/ujian", [UjianController::class, "store"]);
         Route::put("/ujian/{id}", [UjianController::class, "update"]);
         Route::delete("/ujian/{id}", [UjianController::class, "destroy"]);
@@ -100,6 +121,26 @@ Route::prefix("/admin")->group(function () {
         Route::put("/daftar_kelas/{id}", [DaftarKelasController::class, "update"]);
         Route::delete("/daftar_kelas/{id}", [DaftarKelasController::class, "destroy"]);
 
+<<<<<<< HEAD
+        // Sesi Ujian
+        Route::get("/sesi_ujian", [SesiUjianController::class, "index"]);
+        Route::get("/sesi_ujian/{id}", [SesiUjianController::class, "show"]);
+        Route::post("/sesi_ujian", [SesiUjianController::class, "store"]);
+        Route::put("/sesi_ujian/{id}", [SesiUjianController::class, "update"]);
+        Route::delete("/sesi_ujian/{id}", [SesiUjianController::class, "destroy"]);
+
+
+        // Submit Ujian
+        Route::post("/submit_ujian",[\App\Http\Controllers\v1\SubmitUjian\UjianController::class, "submitUjian"]);
+
+        // // Nilai Ujian
+        // Route::get("/nilai_ujian", [NilaiUjianController::class, "index"]);
+
+        // Hasil Ujian
+        Route::get("/hasil_ujian", [HasilUjianController::class, "index"]);
+        Route::get("/hasil_ujian/show/{id}",[HasilUjianController::class, "show"]);
+        Route::put("/hasil_ujian/update/{id}",[HasilUjianController::class,"update"]);
+=======
         // Submit Ujian
         Route::post("/submit_ujian", [\App\Http\Controllers\v1\SubmitUjian\UjianController::class, "submitUjian"]);
 
@@ -108,6 +149,7 @@ Route::prefix("/admin")->group(function () {
 
         // Hasil Ujian
         Route::get("/hasil_ujian", [HasilUjianController::class, "index"]);
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);
         Route::get("/hasil_ujian/reevaluate", [HasilUjianController::class, "reevaluate"]);
     });
@@ -134,6 +176,32 @@ Route::prefix("/siswa")->group(function(){
     Route::post("/login", [AuthController::class, "pesertaLogin"]);
     Route::post("/register", [AuthController::class, "pesertaRegister"]);
     Route::post("/logout", [AuthController::class, "pesertaLogout"]);
+<<<<<<< HEAD
+    Route::get("/something", function(){
+    return response()->json(["message" => "Server is up"]);
+    });
+    //middleware([JwtMiddleware::class])->
+  Route::group([],function(){
+    //Route::middleware([JwtMiddleware::class])->group(function(){
+        Route::get("/peserta", [PesertaController::class, "getSelf"]);
+
+        // Sesi Ujian
+        Route::get("/sesi_ujian", [SesiUjianController::class, "index"]);
+        Route::get("/sesi_ujian/{id}", [SesiUjianController::class, "show"]);
+        Route::post("/sesi_ujian", [SesiUjianController::class, "store"]);
+        Route::put("/sesi_ujian/{id}", [SesiUjianController::class, "update"]);
+        
+        Route::get("/ujian", [UjianController::class, "indexSiswa"]);
+        Route::get("/ujian/{id}", [UjianController::class, "show"]);
+        Route::get("/soal", [SoalController::class, "index"]);
+        Route::get("/sesi_soal", [SesiSoalController::class, "index"]);
+        Route::post("/submit_ujian", [App\Http\Controllers\v1\SubmitUjian\UjianController::class, "submitUjian"]);
+        Route::post("/sesi_soal", [SesiSoalController::class, "store"]);
+        
+        // Calculate the value
+        Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);
+        Route::get("/hasil_ujian/reevaluate", [HasilUjianController::class, "reevaluate"]);
+=======
     
     Route::middleware([JwtMiddleware::class])->group(function(){
         Route::get("/peserta", [PesertaController::class, "getSelf"]);
@@ -143,6 +211,7 @@ Route::prefix("/siswa")->group(function(){
         Route::get("/sesi_soal", [SesiSoalController::class, "index"]);
         Route::post("/submit_ujian", [App\Http\Controllers\v1\UjianController::class, "submitUjian"]);
         Route::post("/sesi_soal", [SesiSoalController::class, "store"]);
+>>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
     });
 });
 

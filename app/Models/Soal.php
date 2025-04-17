@@ -8,7 +8,7 @@ class Soal extends Model
 {
     //
     protected $table = 'soals';
-    protected $fillable = ['ujian_id','soal','tipe_soal','pilihan_a','pilihan_b','pilihan_c','pilihan_d','pilihan_e','jawaban'];
+    protected $fillable = ['ujian_id','soal','image','tipe_soal','pilihan_a','pilihan_b','pilihan_c','pilihan_d','pilihan_e','jawaban'];
 
     public function ujian()
     {
