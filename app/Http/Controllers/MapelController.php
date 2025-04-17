@@ -19,12 +19,9 @@ class MapelController extends Controller
             if($request->query("search")){
                 $mapel->where("nama", "like", "%" . $request->query("search") . "%");
             }
-<<<<<<< HEAD
             if ($request->query('mapel_id')){
                 $mapel->where('id',$request->query('mapel_id'));
             }
-=======
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
             return response()->json($mapel->paginate($per_page));
         }
         catch(\Exception $e){

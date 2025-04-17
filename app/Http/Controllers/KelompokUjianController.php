@@ -19,7 +19,6 @@ class KelompokUjianController extends Controller
             if ($request->query('search')) {
                 $kelompok_ujian->where('nama', 'like', '%' . $request->query('search') . '%');
             }
-<<<<<<< HEAD
             $result = $kelompok_ujian->paginate($per_page);
             $result->getCollection()->transform(function ($item) {
                 $item->start_date = $item->start_date ? \Carbon\Carbon::parse($item->start_date)->toIso8601String() : null;
@@ -27,9 +26,6 @@ class KelompokUjianController extends Controller
                 return $item;
             });
             return response()->json($result);
-=======
-            return response()->json($kelompok_ujian->paginate($per_page));
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

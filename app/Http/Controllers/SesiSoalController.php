@@ -16,20 +16,12 @@ class SesiSoalController extends Controller
         try {
             $soal = Sesi_Soal::query();
             if ($request->query('nomor_peserta')) {
-<<<<<<< HEAD
                 $soal->where('nomor_peserta',$request->query('nomor_peserta'));
             }
             if($request->query('ujian_id')){
                 $soal->where('ujian_id', $request->query('ujian_id'));
             }
             $limit = $request->query('limit') ?? 100;
-=======
-                $soal->where('nomor_peserta', 'like', '%' . $request->query('nomor_peserta') . '%');
-            }
-            if($request->query('ujian_id')){
-                $soal->where('ujian_id', 'like', '%' . $request->query('ujian_id') . '%');
-            }
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
             $soal->with('ujian');
             $soal->with('soal');
             $soal->with('peserta');

@@ -35,7 +35,6 @@ class UjianController extends Controller
             $ujian->with("kelompok_ujian");
             $ujian->with("mapel");
             $ujian->with("kelas");
-<<<<<<< HEAD
 
             // Convert start_date and end_date to ISO format
             $ujian->get()->transform(function ($item) {
@@ -120,10 +119,6 @@ class UjianController extends Controller
 
             $ids = $data->pluck('id');
             return response()->json($ids);
-=======
-            $per_page = $request->query("limit") ?? 10;
-            return response()->json($ujian->paginate($per_page));
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
         }

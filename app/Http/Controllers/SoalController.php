@@ -20,7 +20,6 @@ class SoalController extends Controller
             if($request->query("ujian_id")){
                 $soal->where("ujian_id", $request->query("ujian_id"));
             }
-<<<<<<< HEAD
             //$soal->with("ujian");
             $paginateResult = $soal->paginate($request->query("limit") ?? 100);
             foreach ($paginateResult->items() as $item) {
@@ -56,11 +55,6 @@ class SoalController extends Controller
             }
             $per_page = $request->query("limit") ?? 100;
             return response()->json($paginateResult);
-=======
-            $soal->with("ujian");
-            $per_page = $request->query("limit") ?? 100;
-            return response()->json($soal->paginate($per_page));
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         }
         catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);

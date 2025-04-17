@@ -20,7 +20,6 @@ class HasilUjianController extends Controller
         try {
             //code...
             $hasil = Hasil_Ujian::query();
-<<<<<<< HEAD
             $per_page = $request->query("limit") ?? 100;
             $hasil->select('hasil__ujians.id','peserta.nama','hasil__ujians.nomor_peserta as nomor_peserta', 'ujian.id as ujian_id','soal.soal','soal.tipe_soal', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi', 'hasil__ujians.isTrue')
             ->join('soals as soal', 'hasil__ujians.soal_id', '=', 'soal.id')
@@ -36,14 +35,6 @@ class HasilUjianController extends Controller
             if($request->query('ujian_id')){
                 $hasil->where('hasil__ujians.ujian_id', $request->query('ujian_id'));
             }
-=======
-            $per_page = $request->query("limit") ?? 10;
-            $hasil->select('peserta.nama', 'ujian.id as ujian_id','soal.soal', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi', 'Hasil__Ujians.isTrue')
-            ->join('Soals as soal', 'Hasil__Ujians.soal_id', '=', 'soal.id')
-            ->join('Ujians as ujian','Hasil__Ujians.ujian_id','=','ujian.id')
-            ->join('Sesi__Soals as sesi_soal', 'Hasil__Ujians.sesi_soal_id', '=', 'sesi_soal.id')
-            ->join('Pesertas as peserta', 'Hasil__Ujians.nomor_peserta', '=', 'peserta.nomor_peserta');
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
     
             return response()->json($hasil->paginate($per_page));
         } catch (\Throwable $th) {
@@ -54,7 +45,6 @@ class HasilUjianController extends Controller
     public function reevaluate(Request $request){
         try{
             $ujian = Ujian::query();
-<<<<<<< HEAD
             $ujian->select('peserta.nomor_peserta', 'ujians.id as ujian_id', 'soal.id as soal_id','soal.tipe_soal as tipe_soal', 'sesi_soal.id as sesi_soal_id', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi')
                   ->join('soals as soal', 'ujians.id', '=', 'soal.ujian_id')
                   ->join('sesi__soals as sesi_soal', 'ujians.id', '=', 'sesi_soal.ujian_id')
@@ -64,17 +54,6 @@ class HasilUjianController extends Controller
                   foreach ($data as $item) {
                     $find = Hasil_Ujian::where('nomor_peserta', $item->nomor_peserta)->where('ujian_id', $item->ujian_id)->where('soal_id', $item->soal_id)->where('sesi_soal_id', $item->sesi_soal_id);
                     if($find->count() > 0 && $item->jawaban_soal != null && $item->tipe_soal == "pilihan_ganda"){
-=======
-            $ujian->select('peserta.nomor_peserta', 'Ujians.id as ujian_id', 'soal.id as soal_id', 'sesi_soal.id as sesi_soal_id', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi')
-                  ->join('Soals as soal', 'Ujians.id', '=', 'soal.ujian_id')
-                  ->join('Sesi__Ujians as sesi_ujian', 'Ujians.id', '=', 'sesi_ujian.ujian_id')
-                  ->join('Sesi__Soals as sesi_soal', 'sesi_ujian.id', '=', 'sesi_soal.sesi_ujian_id')
-                  ->join('Pesertas as peserta', 'sesi_ujian.nomor_peserta', '=', 'peserta.nomor_peserta')
-                  ->chunk(100, function ($data) {
-                  foreach ($data as $item) {
-                    $find = Hasil_Ujian::where('nomor_peserta', $item->nomor_peserta)->where('ujian_id', $item->ujian_id)->where('soal_id', $item->soal_id)->where('sesi_soal_id', $item->sesi_soal_id);
-                    if($find->count() > 0 && $item->jawaban_soal != null){
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
                         $find->update([
                         'isTrue' => $item->jawaban_soal == $item->jawaban_sesi // or any default value
                         ]);
@@ -88,7 +67,6 @@ class HasilUjianController extends Controller
                     }
                   }
                   });
-<<<<<<< HEAD
             
             $hasil_ujian = Hasil_Ujian::query();
             $hasil_ujian->select('nomor_peserta','ujian_id','soal_id','jawaban_soal','jawaban_sesi')
@@ -107,30 +85,17 @@ class HasilUjianController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json($th->getMessage());
-=======
-        } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json($th);
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         }
     }
 
     public function migrate(){
         try{
             $ujian = Ujian::query();
-<<<<<<< HEAD
             $ujian->select('peserta.nomor_peserta', 'ujians.id as ujian_id', 'soal.id as soal_id', 'sesi_soal.id as sesi_soal_id','soal.tipe_soal as tipe_soal', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi')
                   ->join('soals as soal', 'ujians.id', '=', 'soal.ujian_id')
                   //->join('sesi__ujians as sesi_ujian', 'Ujians.id', '=', 'sesi_ujian.ujian_id')
                   ->join('sesi__soals as sesi_soal', 'ujians.id', '=', 'sesi_soal.ujian_id')
                   ->join('pesertas as peserta', 'sesi_soal.nomor_peserta', '=', 'peserta.nomor_peserta')
-=======
-            $ujian->select('peserta.nomor_peserta', 'Ujians.id as ujian_id', 'soal.id as soal_id', 'sesi_soal.id as sesi_soal_id', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi')
-                  ->join('Soals as soal', 'Ujians.id', '=', 'soal.ujian_id')
-                  ->join('Sesi__Ujians as sesi_ujian', 'Ujians.id', '=', 'sesi_ujian.ujian_id')
-                  ->join('Sesi__Soals as sesi_soal', 'sesi_ujian.id', '=', 'sesi_soal.sesi_ujian_id')
-                  ->join('Pesertas as peserta', 'sesi_ujian.nomor_peserta', '=', 'peserta.nomor_peserta')
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
                   ->chunk(100, function ($data) {
                   foreach ($data as $item) {
                     $find = Hasil_Ujian::where('nomor_peserta', $item->nomor_peserta)->where('ujian_id', $item->ujian_id)->where('soal_id', $item->soal_id)->where('sesi_soal_id', $item->sesi_soal_id);
@@ -140,21 +105,15 @@ class HasilUjianController extends Controller
                       'ujian_id' => $item->ujian_id,
                       'soal_id' => $item->soal_id,
                       'sesi_soal_id' => $item->sesi_soal_id,
-<<<<<<< HEAD
                       'tipe_soal' => $item->tipe_soal,
                       'jawaban_soal' => $item->jawaban_soal,
                       'jawaban_sesi' => $item->jawaban_sesi,
-=======
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
                       'isTrue' => $item->jawaban_soal == $item->jawaban_sesi // or any default value
                       ]);
                     }
                   }
                   });
-<<<<<<< HEAD
                   return response()->json(["msg"=>"Migrate Successfully"],201);
-=======
->>>>>>> f6925f0209e602d33cfce465645b0879fee9227d
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json($th);
