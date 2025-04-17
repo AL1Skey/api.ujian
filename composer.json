@@ -10,7 +10,8 @@
         "firebase/php-jwt": "^6.11",
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
-        "php-open-source-saver/jwt-auth": "*"
+        "php-open-source-saver/jwt-auth": "*",
+        "phpoffice/phpword": "^1.3"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

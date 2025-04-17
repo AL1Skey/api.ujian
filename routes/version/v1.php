@@ -24,8 +24,8 @@ Route::prefix("/admin")->group(function () {
     Route::post("/logout", [AuthController::class, "guruLogout"]);
     
     //middleware([JwtMiddleware::class])->
-    // Route::group([],function(){
-    Route::middleware([JwtMiddleware::class])->group(function(){
+    Route::group([], function(){
+        // Route::middleware([JwtMiddleware::class])->group(function(){
         // Peserta
         Route::get("/peserta", [PesertaController::class, "index"]);
         Route::get("/peserta/{id}", [PesertaController::class, "show"]);
@@ -88,6 +88,8 @@ Route::prefix("/admin")->group(function () {
         Route::post("/soal", [SoalController::class, "store"]);
         Route::put("/soal/{id}", [SoalController::class, "update"]);
         Route::delete("/soal/{id}", [SoalController::class, "destroy"]);
+
+        Route::post("/import-soal",[SoalController::class,"import"]);
 
         // Ujian
         Route::get("/ujian", [UjianController::class, "index"]);
