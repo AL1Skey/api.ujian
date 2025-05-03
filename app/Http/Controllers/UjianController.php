@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Kelompok_Ujian;
 use App\Models\Mapel;
 use App\Models\Daftar_Kelas;
+use Carbon\Carbon;
 // use App\Models\SesiUjian;
 
 class UjianController extends Controller
@@ -59,6 +60,7 @@ class UjianController extends Controller
                 'isTrue' => Sesi_Ujian::query()
                     ->select('isTrue')
                     ->whereColumn('sesi__ujians.ujian_id','ujians.id')
+                    ->where('nomor_peserta',$request->query('nomor_peserta',''))
                     ->where('isTrue',1)
                     ->limit(1) ?? false,
                 'nomor_peserta' => Sesi_Ujian::query()
@@ -85,7 +87,7 @@ class UjianController extends Controller
             $check_ujian = Sesi_Ujian::query()
                 ->where('nomor_peserta', $request->query('nomor_peserta'))
                 ->first();
-                
+
             if($check_ujian) {    
                 if ($request->query("nomor_peserta")) {
                     
@@ -113,6 +115,21 @@ class UjianController extends Controller
             if ($request->query('mapel_id')){
                 $ujian->where('mapel_id',$request->query('mapel_id'));
             }
+            if ($request->query("date")) {
+                // dd($request->query('date'));
+                if ($request->query("date")) {
+                    $date = Carbon::parse($request->query('date'))->toDateTimeString();
+                    $ujian->where('start_date', '<=', $date)
+                          ->where('end_date',   '>=', $date);
+                }
+            }
+            // if ($request->query("end_date")) {
+            //     $ujian->where("end_date", "<=", $request->query("end_date"));
+            // }
+            if ($request->query("kelas_id")) {
+                $ujian->where("kelas_id", $request->query("kelas_id"));
+            }
+            // dd($request->query('kelas_id'));
     
             $ujian->with("kelompok_ujian");
             $ujian->with("mapel");
