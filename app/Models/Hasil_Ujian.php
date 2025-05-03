@@ -24,4 +24,21 @@ class Hasil_Ujian extends Model
     {
         return $this->belongsTo(Peserta::class, 'nomor_peserta', 'nomor_peserta');
     }
+
+    /**
+     * Accessor: get the Mapel model via the related Ujian
+     */
+    public function getMapelAttribute()
+    {
+        return optional($this->ujian)->mapel;
+    }
+
+    /**
+     * Accessor: get the Kelas model via the related Peserta
+     */
+    public function getKelasAttribute()
+    {
+        return optional($this->peserta)->kelas;
+    }
+
 }

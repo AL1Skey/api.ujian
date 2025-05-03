@@ -39,7 +39,7 @@ class HasilUjianController extends Controller
             return response()->json($hasil->paginate($per_page));
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json($th);
+            return response()->json($th,500);
         }
     }
     public function reevaluate(Request $request){
@@ -116,7 +116,98 @@ class HasilUjianController extends Controller
                   return response()->json(["msg"=>"Migrate Successfully"],201);
         } catch (\Throwable $th) {
             //throw $th;
-            return response()->json($th);
+            return response()->json($th,500);
+        }
+    }
+
+    public function hasilUjianAnalysis($id){
+        try{
+                // fetch all answers for this exam
+                $records = Hasil_Ujian::where('ujian_id', $id)
+                    ->with('peserta.kelas')
+                    ->get();
+
+                // compute per-student percentage scores
+                $scores = $records
+                    ->groupBy('nomor_peserta')
+                    ->map(function($items, $nomor) {
+                        $correct = $items->sum('isTrue');
+                        $total   = $items->count();
+                        $percent = $total ? ($correct / $total) * 100 : 0;
+                        $peserta = $items->first()->peserta;
+                        return [
+                            'nomor_peserta' => $nomor,
+                            'nama'          => $peserta->nama,
+                            'kelas'         => $peserta->kelas->nama ?? null,
+                            'score'         => round($percent, 2),
+                        ];
+                    })
+                    ->values()
+                    ->sortByDesc('score')
+                    ->values();
+
+                // prepare raw values for stats
+                $values = $scores->pluck('score')->toArray();
+                $n      = count($values);
+                $min    = $n ? min($values) : 0;
+                $max    = $n ? max($values) : 0;
+                $avg    = $n ? array_sum($values) / $n : 0;
+
+                // median
+                sort($values);
+                if ($n % 2 === 0) {
+                    $m1     = $values[$n/2 - 1];
+                    $m2     = $values[$n/2];
+                    $median = ($m1 + $m2) / 2;
+                } else {
+                    $median = $values[floor($n/2)];
+                }
+
+                // standard deviation (population)
+                $variance = $n
+                    ? array_sum(array_map(fn($v) => pow($v - $avg, 2), $values)) / $n
+                    : 0;
+                $stdDev = sqrt($variance);
+
+                // 95% confidence interval for the mean
+                $se     = $n ? ($stdDev / sqrt($n)) : 0;
+                $ciLow  = $avg - 1.96 * $se;
+                $ciHigh = $avg + 1.96 * $se;
+
+                // ranking within each class
+                $rankingByClass = $scores
+                    ->groupBy('kelas')
+                    ->map(function($group) {
+                        return $group
+                            ->sortByDesc('score')
+                            ->values()
+                            ->map(fn($item, $idx) => array_merge($item, ['rank' => $idx + 1]));
+                    });
+
+                // return JSON response
+                return response()->json([
+                    'descriptive'      => [
+                        'count'  => $n,
+                        'min'    => $min,
+                        'max'    => $max,
+                        'average'=> round($avg, 2),
+                        'median' => $median,
+                        'stdDev' => round($stdDev, 2),
+                    ],
+                    'inferential'      => [
+                        'confidence_interval_95' => [
+                            'low'  => round($ciLow, 2),
+                            'high' => round($ciHigh, 2),
+                        ]
+                    ],
+                    'scores'           => $scores,
+                    'ranking_by_class' => $rankingByClass,
+                ], 200);
+
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json($th,500);
         }
     }
 
@@ -159,8 +250,8 @@ class HasilUjianController extends Controller
             
             return response()->json(["msg"=>"Hasil Ujian Updated Successfully"]);
         }
-        catch(Throwable $th){
-            return response()->json($th);
+        catch(\Throwable $th){
+            return response()->json($th,500);
         }
     }
 

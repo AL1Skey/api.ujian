@@ -129,6 +129,7 @@ Route::prefix("/admin")->group(function () {
         Route::get("/hasil_ujian", [HasilUjianController::class, "index"]);
         Route::get("/hasil_ujian/show/{id}",[HasilUjianController::class, "show"]);
         Route::put("/hasil_ujian/update/{id}",[HasilUjianController::class,"update"]);
+        Route::get("/hasil_ujian/analysis/{id}",[HasilUjianController::class,"hasilUjianAnalysis"]);
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);
         Route::get("/hasil_ujian/reevaluate", [HasilUjianController::class, "reevaluate"]);
     });
