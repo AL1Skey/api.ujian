@@ -287,7 +287,7 @@ class SoalController extends Controller
 
         $count = 0;
         
-        $tipe_soal = ["pilihan_ganda",'essay'];
+        $tipe_soal = ["pilihan_ganda",'essai'];
         $parsed = [];
         foreach ($tables as $row) {
             if (empty($row[0]) || !is_numeric($row[0])) continue;

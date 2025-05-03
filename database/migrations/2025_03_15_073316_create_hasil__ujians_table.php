@@ -20,6 +20,9 @@ return new class extends Migration
             $table->foreign('soal_id')->references('id')->on('soals')->nullOnDelete()->cascadeOnUpdate();
             $table->unsignedBigInteger('sesi_soal_id')->nullable();
             $table->foreign('sesi_soal_id')->references('id')->on('sesi__soals')->nullOnDelete()->cascadeOnUpdate();
+            $table->string('tipe_soal')->nullable();
+            $table->string('jawaban_soal')->nullable();
+            $table->string('jawaban_sesi')->nullable();
             $table->boolean('isTrue')->nullable();
             $table->timestamps();
         });
