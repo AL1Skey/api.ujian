@@ -123,19 +123,7 @@ class PesertaController extends Controller
 
             $peserta = Peserta::findOrFail($id);
             $data = $this->handleRequest($request);
-
-            $checkJurusan = Jurusan::query()->find($request->jurusan_id);
-            if (!$checkJurusan) {
-                $data['jurusan_id'] = null;
-            }
-            $checkAgama = Agama::query()->find($request->agama_id);
-            if (!$checkAgama) {
-                $data['agama_id'] = null;
-            }
-            $checkKelas = Daftar_Kelas::query()->find($request->kelas_id);
-            if (!$checkKelas) {
-                $data['kelas_id'] = null;
-            }
+            
             if ($request->password) {
                 $data['password'] = Hash::make($data['password']);
             }

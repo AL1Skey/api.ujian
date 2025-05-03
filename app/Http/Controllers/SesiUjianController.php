@@ -90,15 +90,6 @@ class SesiUjianController extends Controller
             ]);
             $data = $this->handleRequest($request);
 
-            $check_ujian = Ujian::query()->find($request->ujian_id);
-            if(!$check_ujian) {
-                $data['ujian_id'] = null;
-            }
-            $check_peserta = Peserta::query()->where("nomor_peserta", $request->nomor_peserta)->first();
-            if(!$check_peserta) {
-                $data['nomor_peserta'] = null;
-            }
-
             $sesi_ujian = Sesi_Ujian::findOrFail($id);
             $sesi_ujian->update($data);
             return response()->json($sesi_ujian);
