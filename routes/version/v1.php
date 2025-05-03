@@ -175,7 +175,7 @@ Route::prefix("/siswa")->group(function(){
         Route::get("/soal", [SoalController::class, "index"]);
         Route::get("/sesi_soal", [SesiSoalController::class, "index"]);
         Route::post("/submit_ujian", [App\Http\Controllers\v1\SubmitUjian\UjianController::class, "submitUjian"]);
-        Route::post("/sesi_soal", [SesiSoalController::class, "store"]);
+        Route::post("/sesi_soal", [SesiSoalController::class, "upstore"]);
         
         // Calculate the value
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);

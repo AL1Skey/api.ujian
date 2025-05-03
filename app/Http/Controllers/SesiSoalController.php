@@ -72,7 +72,16 @@ class SesiSoalController extends Controller
             $data = $this->handleRequest($request);
             $soalId = Sesi_Soal::query();
             $soalId = $soalId->where('ujian_id',$request->ujian_id)->where('soal_id',$request->soal_id)->where('nomor_peserta',$request->nomor_peserta);
-            $soal = Sesi_Soal::create($data);
+            $soal="";
+            if($soalId->exists()){
+                $soal = Sesi_Soal::findOrFail($soalId->first()->id);
+                $soal->update($data);
+                return response()->json($soal, 200);
+            }
+            else{
+                $data['jawaban'] = $request->jawaban;
+                $soal = Sesi_Soal::create($data);
+            }
             return response()->json($soal, 201);
         } catch (\Throwable $th) {
             //throw $th;

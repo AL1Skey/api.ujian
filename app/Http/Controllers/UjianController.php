@@ -82,17 +82,33 @@ class UjianController extends Controller
             // if ($request->query("id_sekolah")) {
             //     $ujian->where("id_sekolah", "like", "%" . $request->query("id_sekolah") . "%");
             // }
-            if ($request->query("nomor_peserta")) {
-                $ujian->whereIn('id', Sesi_Ujian::query()
-                    ->select('ujian_id')
-                    ->where('nomor_peserta', $request->query('nomor_peserta'))
-                );
+            $check_ujian = Sesi_Ujian::query()
+                ->where('nomor_peserta', $request->query('nomor_peserta'))
+                ->first();
+                
+            if($check_ujian) {    
+                if ($request->query("nomor_peserta")) {
+                    
+                        $ujian->whereIn('id', Sesi_Ujian::query()
+                            ->select('ujian_id')
+                            ->where('nomor_peserta', $request->query('nomor_peserta'))
+                        );
+                    
+                        // if($ujian->get('isTrue') == true){
+                    //     dd($ujian->get('isTrue')->toArray());
+                    //     // $ujian->where("sesi__ujians.nomor_peserta", $request->query("nomor_peserta"));
+                    //     $ujian->whereIn('id', Sesi_Ujian::query()
+                    //         ->select('ujian_id')
+                    //         ->where('nomor_peserta', $request->query('nomor_peserta'))
+                    //     );
+                    // }
+                }
             }
             if ($request->query("ujian_id")) {
-                $ujian->where("ujians.id", $request->query("ujian_id"));
+                $ujian->where("id", $request->query("ujian_id"));
             }
             if($request->query("kelompok_id")){
-                $ujian->where("ujians.kelompok_id",$request->query("kelompok_id"));
+                $ujian->where("kelompok_id",$request->query("kelompok_id"));
             }
             if ($request->query('mapel_id')){
                 $ujian->where('mapel_id',$request->query('mapel_id'));

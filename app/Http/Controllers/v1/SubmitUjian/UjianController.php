@@ -30,12 +30,13 @@ class UjianController extends Controller
                     $checkSesiSoal = Sesi_Soal::where('ujian_id', $data['ujian_id'])
                         ->where('nomor_peserta', $data['nomor_peserta'])
                         ->where('soal_id', $data['soal_id'])
-                        ->where('tipe_soal', $data['tipe_soal'])
+                        // ->where('tipe_soal', $data['tipe_soal'])
                         ->first();
                 
                     if($checkSesiSoal){
                         $checkSesiSoal->update([
                             'jawaban' => $data['jawaban'],
+                            'tipe_soal' => $data['tipe_soal'] ?? $checkSesiSoal->tipe_soal,
                         ]);
                     }else{
                         Sesi_Soal::create([
