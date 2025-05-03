@@ -44,6 +44,7 @@ Route::prefix("/admin")->group(function () {
         Route::put("/guru/{id}", [GuruController::class, "update"]);
         Route::delete("/guru/{id}", [GuruController::class, "destroy"]);
 
+        
         // Jurusan
         Route::get("/jurusan", [JurusanController::class, "index"]);
         Route::get("/jurusan/{id}", [JurusanController::class, "show"]);

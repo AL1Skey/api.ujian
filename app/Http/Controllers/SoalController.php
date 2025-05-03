@@ -27,7 +27,7 @@ class SoalController extends Controller
             $paginateResult = $soal->paginate($request->query("limit") ?? 100);
             foreach ($paginateResult->items() as $item) {
                 if($item->image){
-                $item->image = $item->image ? asset('storage/app/public/files/'.$item->image) : null;
+                $item->image = $item->image ? asset('storage/app/public/'.$item->image) : null;
                 }
             }
             
@@ -53,7 +53,7 @@ class SoalController extends Controller
             $paginateResult = $soal->paginate($request->query("limit") ?? 100);
             foreach ($paginateResult->items() as $item) {
                 if($item->image){
-                $item->image = $item->image ? asset('storage/app/public/files/'.$item->image) : null;
+                $item->image = $item->image ? asset('storage/app/public/'.$item->image) : null;
                 }
             }
             $per_page = $request->query("limit") ?? 100;
@@ -107,7 +107,7 @@ class SoalController extends Controller
         try{
             $soal = Soal::findOrFail($id);
             $soal->load("ujian");
-            $soal->image = $soal->image ? asset('public/files/' . $soal->image) : null;
+            $soal->image = $soal->image ? asset('public/' . $soal->image) : null;
             return response()->json($soal);
         }
         catch (\Exception $e) {
@@ -170,7 +170,7 @@ class SoalController extends Controller
     {
         $request->validate([
             'ujian_id'=> 'required|integer',
-            'template' => 'required|file|mimes:docx'
+            'template' => 'required|file'
         ]);
 
         $file = $request->file('template');

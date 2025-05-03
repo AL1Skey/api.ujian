@@ -16,7 +16,8 @@ return new class extends Migration {
             $table->string('password');
             $table->rememberToken();
             $table->string('nama');
-            $table->string('alamat');
+            $table->string('alamat')->nullable();
+            $table->string('role')->default('guru');
             $table->unsignedBigInteger('mapel_id')->nullable();
             $table->foreign('mapel_id')->references('id')->on('mapels')->nullOnDelete()->cascadeOnUpdate();
             $table->boolean('is_active')->default(true);

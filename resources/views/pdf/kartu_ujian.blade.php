@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartu Ujian</title>
+</head>
+
+<body
+    style="font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f5f5f0; background-image: linear-gradient(45deg, #e8f5e9 25%, transparent 25%, transparent 75%, #e8f5e9 75%, #e8f5e9), linear-gradient(45deg, #e8f5e9 25%, transparent 25%, transparent 75%, #e8f5e9 75%, #e8f5e9); background-size: 20px 20px; background-position: 0 0, 10px 10px;">
+    <div
+        style="max-width: 600px; margin: 20px auto; background-color: white; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); overflow: hidden; border: 1px solid #c8e6c9;">
+        <!-- Header dengan ornamen Arab -->
+        <div style="background-color: #1b5e20; color: white; padding: 0; position: relative; overflow: hidden;">
+            <!-- Ornamental Border -->
+            <div
+                style="height: 10px; background: repeating-linear-gradient(45deg, #d4af37, #d4af37 10px, #1b5e20 10px, #1b5e20 20px);">
+            </div>
+
+            <div
+                style="padding: 15px; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(to bottom, #1b5e20, #2e7d32);">
+                <div>
+                    <img src="resources\views\pdf\logo-pesri.png" alt="Logo Institusi"
+                        style="height: 60px; border: 2px solid #d4af37; border-radius: 50%;">
+                </div>
+                <div style="text-align: center; flex-grow: 1;">
+                    <h2 style="margin: 0; font-size: 20px; font-weight: normal;">KARTU UJIAN</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 14px;">MTS UMMUSSHABRI PESRI KENDARI</p>
+                </div>
+                <div style="width: 60px;"></div> <!-- Spacer for balance -->
+            </div>
+
+            <!-- Ornamental Border -->
+            <div
+                style="height: 10px; background: repeating-linear-gradient(45deg, #d4af37, #d4af37 10px, #1b5e20 10px, #1b5e20 20px);">
+            </div>
+        </div>
+
+        <!-- Ornamental Divider -->
+        <div style="text-align: center; margin: 10px 0; padding: 0 20px;">
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div
+                    style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, #d4af37, transparent);">
+                </div>
+                <div style="margin: 0 15px; color: #1b5e20; font-size: 18px;">✧</div>
+                <div
+                    style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, #d4af37, transparent);">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Informasi Siswa -->
+        <div style="padding: 10px 20px 20px; display: flex; background-color: rgba(232, 245, 233, 0.3);">
+            <div style="flex: 3; padding-right: 20px;">
+                <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                        <td
+                            style="padding: 8px 0; font-weight: bold; width: 120px; color: #1b5e20; border-bottom: 1px dotted #a5d6a7;">
+                            Nama</td>
+                        <td style="padding: 8px 0; border-bottom: 1px dotted #a5d6a7;">: {{ $student["nama"] }}</td>
+                    </tr>
+                    <tr>
+                        <td
+                            style="padding: 8px 0; font-weight: bold; color: #1b5e20; border-bottom: 1px dotted #a5d6a7;">
+                            NIM/NPM</td>
+                        <td style="padding: 8px 0; border-bottom: 1px dotted #a5d6a7;">:
+                            {{ $student["nomor_peserta"] ?? '123456789' }}</td>
+                    </tr>
+                    <tr>
+                        <td
+                            style="padding: 8px 0; font-weight: bold; color: #1b5e20; border-bottom: 1px dotted #a5d6a7;">
+                            Kelas</td>
+                        <td style="padding: 8px 0; border-bottom: 1px dotted #a5d6a7;">:
+                            {{ $student["kelas"]["nama"] ?? 'Teknik Informatika' }}</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- <div style="position: absolute; top: 20px; right: 20px; width: 100px; display: flex; flex-direction: column; align-items: center; justify-content: space-between;">
+                <div
+                    style="border: 2px solid #d4af37; padding: 5px; width: 100px; height: 130px; display: flex; align-items: center; justify-content: center; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <span style="color: #81c784; font-size: 12px; text-align: center;">Foto 3x4</span>
+                </div>
+            </div> -->
+            <!-- Foto dan QR Code -->
+        </div>
+
+        <!-- Ornamental Divider -->
+        <div style="text-align: center; margin: 0; padding: 0 20px;">
+            <div style="display: flex; align-items: center; justify-content: center;">
+                <div
+                    style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, #d4af37, transparent);">
+                </div>
+                <div style="margin: 0 15px; color: #1b5e20; font-size: 18px;">✧</div>
+                <div
+                    style="flex-grow: 1; height: 1px; background: linear-gradient(to right, transparent, #d4af37, transparent);">
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div
+            style="background-color: #e8f5e9; padding: 15px; border-top: 2px solid #d4af37; text-align: center; background-image: linear-gradient(45deg, rgba(212, 175, 55, 0.1) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.1) 75%, rgba(212, 175, 55, 0.1)), linear-gradient(45deg, rgba(212, 175, 55, 0.1) 25%, transparent 25%, transparent 75%, rgba(212, 175, 55, 0.1) 75%, rgba(212, 175, 55, 0.1)); background-size: 20px 20px; background-position: 0 0, 10px 10px;">
+            <p style="margin: 0; font-size: 14px; color: #2e7d32; font-weight: bold;">Harap membawa kartu ujian ini dan
+                kartu identitas saat ujian</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #388e3c;">Dilarang membawa alat komunikasi dan
+                melakukan kecurangan dalam bentuk apapun</p>
+        </div>
+
+
+
+        <!-- Ornamental Border Bottom -->
+        <div
+            style="height: 10px; background: repeating-linear-gradient(45deg, #d4af37, #d4af37 10px, #1b5e20 10px, #1b5e20 20px);">
+        </div>
+    </div>
+</body>
+
+</html>

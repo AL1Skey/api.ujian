@@ -25,12 +25,24 @@ abstract class Controller
                 $data[$key] = date(DATE_ISO8601, strtotime($value));
             }
             */
+            // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
+                //     $data[$key] = new \DateTime($value);
+                // }
+            if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
+                $data[$key] = date('Y-m-d H:i:s', strtotime($value));
+            }
+                    
             if ($key === 'image' ) {
                 //$fileName = 'blob_' . time() . '.png'; // Adjust the file extension as needed
                 //Storage::put('public/files/' . $fileName, base64_decode($value));
                 //dd($value);
+                if($this->isBlobString($value)){
                 $fileName = $this->saveBase64File($value,"files" );
                 $data['image'] = $fileName;
+                }
+                else if($value){
+                    unset($data['image']);
+                }
             }
            
         }
@@ -40,7 +52,7 @@ abstract class Controller
     private function isBlobString($value)
     {
         // Check if the value is a base64-encoded string
-        return is_string($value) && base64_decode($value, true) !== false;
+        return is_string($value) && preg_match('/^data:(.*?);base64,(.*)$/', $value, $matches);
     }
     
     private function saveBase64File(string $base64String, string $folder = 'uploads'): string

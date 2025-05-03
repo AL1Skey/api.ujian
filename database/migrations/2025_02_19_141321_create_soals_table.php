@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('ujian_id')->nullable();
             $table->foreign('ujian_id')->references('id')->on('ujians')->nullOnDelete()->cascadeOnUpdate();
-            $table->string('soal')->nullable();
+            $table->longText('soal')->nullable();
             $table->string('image')->nullable();
             $table->string('tipe_soal');
             $table->string('pilihan_a')->nullable();

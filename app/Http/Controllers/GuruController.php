@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Guru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Service\ImportGuru;
 class GuruController extends Controller
 {
     /**
@@ -116,6 +118,20 @@ class GuruController extends Controller
                 ]);
             }
             return response()->json(['message' => 'Data not found'], 404);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    public function import(Request $request)
+    {
+        try {
+            $file = $request->file('file');
+            if ($file) {
+                Excel::import(new ImportGuru, $file);
+                return response()->json(['message' => 'Data imported successfully']);
+            }
+            return response()->json(['message' => 'File not found'], 400);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
         }

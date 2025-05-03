@@ -25,7 +25,7 @@ Route::prefix("/admin")->group(function () {
     
     //middleware([JwtMiddleware::class])->
     Route::group([], function(){
-        // Route::middleware([JwtMiddleware::class])->group(function(){
+    // Route::middleware([JwtMiddleware::class])->group(function(){
         // Peserta
         Route::get("/peserta", [PesertaController::class, "index"]);
         Route::get("/peserta/{id}", [PesertaController::class, "show"]);
@@ -46,6 +46,8 @@ Route::prefix("/admin")->group(function () {
         Route::post("/guru", [GuruController::class, "store"]);
         Route::put("/guru/{id}", [GuruController::class, "update"]);
         Route::delete("/guru/{id}", [GuruController::class, "destroy"]);
+
+        Route::post("/import_guru", [GuruController::class, "import"]);
 
         // Jurusan
         Route::get("/jurusan", [JurusanController::class, "index"]);
@@ -74,6 +76,9 @@ Route::prefix("/admin")->group(function () {
         Route::post("/peserta", [PesertaController::class, "store"]);
         Route::put("/peserta/{id}", [PesertaController::class, "update"]);
         Route::delete("/peserta/{id}", [PesertaController::class, "destroy"]);
+
+        Route::get("/print_kartu_ujian/{id}", [PesertaController::class, "kartuUjian"]);
+        Route::post("/import_peserta", [PesertaController::class, "import"]);
 
         // Sesi Soal
         Route::get("/sesi_soal", [SesiSoalController::class, "index"]);
