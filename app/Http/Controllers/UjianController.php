@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sesi_Ujian;
 use App\Models\Ujian;
 use Illuminate\Http\Request;
 use App\Models\Kelompok_Ujian;
 use App\Models\Mapel;
 use App\Models\Daftar_Kelas;
+// use App\Models\SesiUjian;
 
 class UjianController extends Controller
 {
@@ -53,15 +55,38 @@ class UjianController extends Controller
     public function indexSiswa(Request $request){
         try {
             $ujian = Ujian::query();
-            $ujian->leftJoin('sesi__ujians', 'ujians.id', '=', 'sesi__ujians.ujian_id')
-                  ->select('ujians.*'); // Explicitly select columns from ujians
+            $ujian->addSelect([
+                'isTrue' => Sesi_Ujian::query()
+                    ->select('isTrue')
+                    ->whereColumn('sesi__ujians.ujian_id','ujians.id')
+                    ->where('isTrue',1)
+                    ->limit(1) ?? false,
+                'nomor_peserta' => Sesi_Ujian::query()
+                    ->select('nomor_peserta')
+                    ->whereColumn('sesi__ujians.ujian_id','ujians.id')
+                    ->limit(1) ?? null
+            ]);
+        //     // dd($request->query('nomor_peserta',''));
+        //     dd( Sesi_Ujian::query()
+        //     ->select('isTrue')
+        //     // ->whereColumn('sesi__ujians.ujian_id','ujians.id')
+        //     ->where('nomor_peserta',$request->query('nomor_peserta',''))
+        //     // ->where('ujian_id',$request->query('ujian_id',''))
+        //     ->where('isTrue',true)
+        //     ->limit(1)
+        //     ->get()
+        //     ->toArray()
+        // );
     
             // Existing query conditions...
-            if ($request->query("id_sekolah")) {
-                $ujian->where("id_sekolah", "like", "%" . $request->query("id_sekolah") . "%");
-            }
+            // if ($request->query("id_sekolah")) {
+            //     $ujian->where("id_sekolah", "like", "%" . $request->query("id_sekolah") . "%");
+            // }
             if ($request->query("nomor_peserta")) {
-                $ujian->where("sesi__ujians.nomor_peserta", $request->query("nomor_peserta"));
+                $ujian->whereIn('id', Sesi_Ujian::query()
+                    ->select('ujian_id')
+                    ->where('nomor_peserta', $request->query('nomor_peserta'))
+                );
             }
             if ($request->query("ujian_id")) {
                 $ujian->where("ujians.id", $request->query("ujian_id"));
@@ -83,8 +108,9 @@ class UjianController extends Controller
                 $item->end_date = \Carbon\Carbon::parse($item->end_date)->toIso8601String();
                 return $item;
             });
-    
+            
             $per_page = $request->query("limit") ?? 10;
+            // dd($ujian->paginate($per_page));
             return response()->json($ujian->paginate($per_page));
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);

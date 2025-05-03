@@ -28,9 +28,12 @@ abstract class Controller
             // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
                 //     $data[$key] = new \DateTime($value);
                 // }
-            if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
-                $data[$key] = date('Y-m-d H:i:s', strtotime($value));
-            }
+            // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
+            //     // Parse the incoming datetime (with any timezone info) and normalize to UTC ISO 8601
+            //     $data[$key] = \Carbon\Carbon::parse($value)
+            //         ->utc()
+            //         ->toIso8601String();
+            // }
                     
             if ($key === 'image' ) {
                 //$fileName = 'blob_' . time() . '.png'; // Adjust the file extension as needed
