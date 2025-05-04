@@ -120,94 +120,113 @@ class HasilUjianController extends Controller
         }
     }
 
-    public function hasilUjianAnalysis($id){
-        try{
-                // fetch all answers for this exam
-                $records = Hasil_Ujian::where('ujian_id', $id)
-                    ->with('peserta.kelas')
-                    ->get();
-
-                // compute per-student percentage scores
-                $scores = $records
-                    ->groupBy('nomor_peserta')
-                    ->map(function($items, $nomor) {
-                        $correct = $items->sum('isTrue');
-                        $total   = $items->count();
-                        $percent = $total ? ($correct / $total) * 100 : 0;
-                        $peserta = $items->first()->peserta;
-                        return [
-                            'nomor_peserta' => $nomor,
-                            'nama'          => $peserta->nama,
-                            'kelas'         => $peserta->kelas->nama ?? null,
-                            'score'         => round($percent, 2),
-                        ];
-                    })
-                    ->values()
-                    ->sortByDesc('score')
-                    ->values();
-
-                // prepare raw values for stats
-                $values = $scores->pluck('score')->toArray();
-                $n      = count($values);
-                $min    = $n ? min($values) : 0;
-                $max    = $n ? max($values) : 0;
-                $avg    = $n ? array_sum($values) / $n : 0;
-
-                // median
-                sort($values);
-                if ($n % 2 === 0) {
-                    $m1     = $values[$n/2 - 1];
-                    $m2     = $values[$n/2];
-                    $median = ($m1 + $m2) / 2;
-                } else {
-                    $median = $values[floor($n/2)];
-                }
-
-                // standard deviation (population)
-                $variance = $n
-                    ? array_sum(array_map(fn($v) => pow($v - $avg, 2), $values)) / $n
-                    : 0;
-                $stdDev = sqrt($variance);
-
-                // 95% confidence interval for the mean
-                $se     = $n ? ($stdDev / sqrt($n)) : 0;
-                $ciLow  = $avg - 1.96 * $se;
-                $ciHigh = $avg + 1.96 * $se;
-
-                // ranking within each class
-                $rankingByClass = $scores
-                    ->groupBy('kelas')
-                    ->map(function($group) {
-                        return $group
-                            ->sortByDesc('score')
-                            ->values()
-                            ->map(fn($item, $idx) => array_merge($item, ['rank' => $idx + 1]));
-                    });
-
-                // return JSON response
-                return response()->json([
-                    'descriptive'      => [
-                        'count'  => $n,
-                        'min'    => $min,
-                        'max'    => $max,
-                        'average'=> round($avg, 2),
-                        'median' => $median,
-                        'stdDev' => round($stdDev, 2),
-                    ],
-                    'inferential'      => [
-                        'confidence_interval_95' => [
-                            'low'  => round($ciLow, 2),
-                            'high' => round($ciHigh, 2),
-                        ]
-                    ],
-                    'scores'           => $scores,
-                    'ranking_by_class' => $rankingByClass,
-                ], 200);
-
-
+    public function hasilUjianAnalysis($id) {
+        try {
+            // Get all exam results with student and class relationships
+            $records = Hasil_Ujian::where('ujian_id', $id)
+                ->with('peserta.kelas')
+                ->get();
+    
+            // Process all student scores
+            $allScores = $records
+                ->groupBy('nomor_peserta')
+                ->map(function($items, $nomor) {
+                    $correct = $items->sum('isTrue');
+                    $total = $items->count();
+                    $percent = $total ? ($correct / $total) * 100 : 0;
+                    $peserta = $items->first()->peserta;
+                    
+                    return [
+                        'nomor_peserta' => $nomor,
+                        'nama' => $peserta->nama,
+                        'kelas' => $peserta->kelas->nama ?? 'Unknown',
+                        'score' => round($percent, 2),
+                    ];
+                })
+                ->values()
+                ->sortByDesc('score');
+    
+            // Get top 5 students
+            $topStudents = $allScores->take(5);
+    
+            // Calculate class statistics
+            $classAnalysis = $allScores
+                ->groupBy('kelas')
+                ->map(function($students, $className) {
+                    return [
+                        'class_name' => $className,
+                        'average_score' => round($students->avg('score'), 2),
+                        'student_count' => $students->count()
+                    ];
+                })
+                ->sortByDesc('average_score')
+                ->values();
+    
+            // Get top 5 and bottom 5 classes
+            $topClasses = $classAnalysis->take(5);
+            $bottomClasses = $classAnalysis->sortBy('average_score')->take(5);
+    
+            // Prepare data for statistical calculations
+            $values = $allScores->pluck('score')->toArray();
+            $n = count($values);
+            
+            // Basic statistics
+            $stats = [
+                'count' => $n,
+                'min' => $n ? min($values) : 0,
+                'max' => $n ? max($values) : 0,
+                'average' => $n ? round(array_sum($values) / $n, 2) : 0,
+            ];
+    
+            // Median calculation
+            sort($values);
+            $median = 0;
+            if ($n) {
+                $middle = floor($n / 2);
+                $median = ($n % 2) ? $values[$middle] : ($values[$middle - 1] + $values[$middle]) / 2;
+            }
+    
+            // Standard deviation
+            $variance = 0;
+            if ($n > 1) {
+                $variance = array_sum(array_map(fn($v) => pow($v - $stats['average'], 2), $values)) / ($n - 1);
+            }
+            $stats['stdDev'] = round(sqrt($variance), 2);
+            $stats['median'] = round($median, 2);
+    
+            // Confidence interval
+            $se = $n ? ($stats['stdDev'] / sqrt($n)) : 0;
+            $stats['confidence_interval'] = [
+                'low' => round($stats['average'] - 1.96 * $se, 2),
+                'high' => round($stats['average'] + 1.96 * $se, 2)
+            ];
+    
+            // Student ranking by class
+            $rankingByClass = $allScores
+                ->groupBy('kelas')
+                ->map(function($group) {
+                    return $group
+                        ->sortByDesc('score')
+                        ->values()
+                        ->map(fn($item, $idx) => array_merge($item, ['rank' => $idx + 1]));
+                });
+    
+            return response()->json([
+                'overall_statistics' => $stats,
+                'top_performers' => $topStudents,
+                'class_analysis' => [
+                    'top_5_classes' => $topClasses,
+                    'bottom_5_classes' => $bottomClasses->values(),
+                    'all_classes' => $classAnalysis
+                ],
+                'detailed_rankings' => $rankingByClass
+            ], 200);
+    
         } catch (\Throwable $th) {
-            //throw $th;
-            return response()->json($th,500);
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 

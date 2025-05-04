@@ -29,8 +29,25 @@ class SoalController extends Controller
                 if($item->image){
                 $item->image = $item->image ? asset('storage/app/public/'.$item->image) : null;
                 }
+
+                if ($item->pilihan_a && Str::contains($item->pilihan_a, 'files/')) {
+                    $item->pilihan_a = asset('storage/app/public/' . $item->pilihan_a);
+                }
+
+                if ($item->pilihan_b && Str::contains($item->pilihan_b, 'files/')) {
+                    $item->pilihan_b = asset('storage/app/public/' . $item->pilihan_b);
+                }
+
+                if ($item->pilihan_c && Str::contains($item->pilihan_c, 'files/')) {
+                    $item->pilihan_c = asset('storage/app/public/' . $item->pilihan_c);
+                }
+
+                if ($item->pilihan_d && Str::contains($item->pilihan_d, 'files/')) {
+                    $item->pilihan_d = asset('storage/app/public/' . $item->pilihan_d);
+                }
+
             }
-            
+            // dd($paginateResult);
             $per_page = $request->query("limit") ?? 100;
             return response()->json($paginateResult);
         }
@@ -55,6 +72,23 @@ class SoalController extends Controller
                 if($item->image){
                 $item->image = $item->image ? asset('storage/app/public/'.$item->image) : null;
                 }
+
+                if ($item->pilihan_a && Str::contains($item->pilihan_a, 'files/')) {
+                    $item->pilihan_a = asset('storage/app/public/' . $item->pilihan_a);
+                }
+
+                if ($item->pilihan_b && Str::contains($item->pilihan_b, 'files/')) {
+                    $item->pilihan_b = asset('storage/app/public/' . $item->pilihan_b);
+                }
+
+                if ($item->pilihan_c && Str::contains($item->pilihan_c, 'files/')) {
+                    $item->pilihan_c = asset('storage/app/public/' . $item->pilihan_c);
+                }
+
+                if ($item->pilihan_d && Str::contains($item->pilihan_d, 'files/')) {
+                    $item->pilihan_d = asset('storage/app/public/' . $item->pilihan_d);
+                }
+
             }
             $per_page = $request->query("limit") ?? 100;
             return response()->json($paginateResult);
@@ -85,6 +119,7 @@ class SoalController extends Controller
             ]);
             $data = $this->handleRequest($request);
            //dd($data);
+            $data['soal'] = base64_decode($data['soal']);
             $check_ujian = Ujian::query()->find($request->ujian_id);
             if(!$check_ujian) {
                 $data['ujian_id'] = null;
@@ -136,6 +171,7 @@ class SoalController extends Controller
             ]);
             $data = $this->handleRequest($request);
             // return response()->json($data);
+            $data['soal'] = base64_decode($data['soal']);
             $soal = Soal::findOrFail($id);
             $soal->update($data);
             return response()->json($soal);
@@ -284,7 +320,6 @@ class SoalController extends Controller
                 }
             }
         }
-
         $count = 0;
         
         $tipe_soal = ["pilihan_ganda",'essai'];
@@ -293,24 +328,42 @@ class SoalController extends Controller
             if (empty($row[0]) || !is_numeric($row[0])) continue;
             // $ujian_id = Ujian::where('name', $row[1])->first(); 
             // cari gambar berdasarkan nomor soal (row[0])
+            // dd($row);
             $matched = collect($imagePaths)->first(function($item) use ($row) {
                 // dd($item);
                 return trim($item['text_before']) === trim($row[0]);
             });
+
+            $pilihan_a_match = collect($imagePaths)->first(function($item) use ($row) {
+                return trim($item['text_before']) === trim($row[4]);
+            });
+            $pilihan_b_match = collect($imagePaths)->first(function($item) use ($row) {
+                return trim($item['text_before']) === trim($row[5]);
+            });
+            $pilihan_c_match = collect($imagePaths)->first(function($item) use ($row) {
+                return trim($item['text_before']) === trim($row[6]);
+            });
+            $pilihan_d_match = collect($imagePaths)->first(function($item) use ($row) {
+                return trim($item['text_before']) === trim($row[7]);
+            });
+            $pilihan_e_match = collect($imagePaths)->first(function($item) use ($row) {
+                return trim($item['text_before']) === trim($row[8]);
+            });
+
             $tipe_soal_payload = (int)$row[3] < count($tipe_soal) ? $tipe_soal[(int)$row[3]] : null;
             if(!$tipe_soal_payload) continue;
             $payload = [
                 'ujian_id' => $request->ujian_id ?? null,
                 // 'image' => $row[2] ?? null,
                 'image' => $matched['image'] ?? null,
-                'soal' => $row[2] ?? '',
+                'soal' => $row[2] ?? ' ',
                 'tipe_soal' => $tipe_soal_payload ,
-                'pilihan_a' => $row[4] ?? null,
-                'pilihan_b' => $row[5] ?? null,
-                'pilihan_c' => $row[6] ?? null,
-                'pilihan_d' => $row[7] ?? null,
-                'pilihan_e' => $row[8] ?? null,
-                'jawaban' => $row[9] ?? null,
+                'pilihan_a' => ($pilihan_a_match['image'] ?? $row[4]) ?? null,
+                'pilihan_b' => ($pilihan_b_match['image'] ?? $row[5]) ?? null,
+                'pilihan_c' => ($pilihan_c_match['image'] ?? $row[6]) ?? null,
+                'pilihan_d' => ($pilihan_d_match['image'] ?? $row[7]) ?? null,
+                'pilihan_e' => ($pilihan_e_match['image'] ?? $row[8]) ?? null,
+                'jawaban' => $row[9] ?? '',
                 // 'bobot' => $row[10] ?? 10,
             ];
             // dd($payload);
