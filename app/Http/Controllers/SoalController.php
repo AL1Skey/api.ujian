@@ -108,7 +108,6 @@ class SoalController extends Controller
             $request->validate([
                 "ujian_id" => "required|integer",
                 "soal" => "required|string",
-                
                 "tipe_soal" => "required|string",
                 "pilihan_a" => "string",
                 "pilihan_b" => "string",

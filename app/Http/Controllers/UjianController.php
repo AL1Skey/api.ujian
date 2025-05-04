@@ -127,7 +127,7 @@ class UjianController extends Controller
             //     $ujian->where("end_date", "<=", $request->query("end_date"));
             // }
             if ($request->query("kelas_id")) {
-                $ujian->where("kelas_id", $request->query("kelas_id"));
+                $ujian->where("kelas_id",'=', $request->query("kelas_id"));
             }
             // dd($request->query('kelas_id'));
     
