@@ -53,98 +53,58 @@ class UjianController extends Controller
         }
     }
 
-    public function indexSiswa(Request $request){
+    public function indexSiswa(Request $request) {
         try {
-            $ujian = Ujian::query();
-            $ujian->addSelect([
-                'isTrue' => Sesi_Ujian::query()
-                    ->select('isTrue')
-                    ->whereColumn('sesi__ujians.ujian_id','ujians.id')
-                    ->where('nomor_peserta',$request->query('nomor_peserta',''))
-                    ->where('isTrue',1)
-                    ->limit(1) ?? false,
-                'nomor_peserta' => Sesi_Ujian::query()
-                    ->select('nomor_peserta')
-                    ->whereColumn('sesi__ujians.ujian_id','ujians.id')
-                    ->limit(1) ?? null
-            ]);
-        //     // dd($request->query('nomor_peserta',''));
-        //     dd( Sesi_Ujian::query()
-        //     ->select('isTrue')
-        //     // ->whereColumn('sesi__ujians.ujian_id','ujians.id')
-        //     ->where('nomor_peserta',$request->query('nomor_peserta',''))
-        //     // ->where('ujian_id',$request->query('ujian_id',''))
-        //     ->where('isTrue',true)
-        //     ->limit(1)
-        //     ->get()
-        //     ->toArray()
-        // );
+            $per_page = $request->query("limit") ?? 10;
+            $nomor_peserta = $request->query('nomor_peserta');
     
-            // Existing query conditions...
-            // if ($request->query("id_sekolah")) {
-            //     $ujian->where("id_sekolah", "like", "%" . $request->query("id_sekolah") . "%");
-            // }
-            $check_ujian = Sesi_Ujian::query()
-                ->where('nomor_peserta', $request->query('nomor_peserta'))
-                ->first();
-
-            if($check_ujian) {    
-                if ($request->query("nomor_peserta")) {
-                    
-                        $ujian->whereIn('id', Sesi_Ujian::query()
-                            ->select('ujian_id')
-                            ->where('nomor_peserta', $request->query('nomor_peserta'))
-                        );
-                    
-                        // if($ujian->get('isTrue') == true){
-                    //     dd($ujian->get('isTrue')->toArray());
-                    //     // $ujian->where("sesi__ujians.nomor_peserta", $request->query("nomor_peserta"));
-                    //     $ujian->whereIn('id', Sesi_Ujian::query()
-                    //         ->select('ujian_id')
-                    //         ->where('nomor_peserta', $request->query('nomor_peserta'))
-                    //     );
-                    // }
-                }
-            }
+            // Base query with conditional left join
+            $ujianQuery = Ujian::query()
+                ->leftJoin('sesi__ujians', function ($join) use ($nomor_peserta) {
+                    $join->on('ujians.id', '=', 'sesi__ujians.ujian_id');
+                    if ($nomor_peserta) {
+                        // Include nomor_peserta in join condition if provided
+                        $join->where('sesi__ujians.nomor_peserta', '=', $nomor_peserta);
+                    }
+                })
+                ->select(
+                    'ujians.*',
+                    'sesi__ujians.nomor_peserta',
+                    'sesi__ujians.isTrue'
+                );
+    
+            // Apply filters from request
             if ($request->query("ujian_id")) {
-                $ujian->where("id", $request->query("ujian_id"));
+                $ujianQuery->where("ujians.id", $request->query("ujian_id"));
             }
-            if($request->query("kelompok_id")){
-                $ujian->where("kelompok_id",$request->query("kelompok_id"));
+            if ($request->query("kelompok_id")) {
+                $ujianQuery->where("ujians.kelompok_id", $request->query("kelompok_id"));
             }
-            if ($request->query('mapel_id')){
-                $ujian->where('mapel_id',$request->query('mapel_id'));
+            if ($request->query("mapel_id")) {
+                $ujianQuery->where("ujians.mapel_id", $request->query("mapel_id"));
             }
             if ($request->query("date")) {
-                // dd($request->query('date'));
-                if ($request->query("date")) {
-                    $date = Carbon::parse($request->query('date'))->toDateTimeString();
-                    $ujian->where('start_date', '<=', $date)
-                          ->where('end_date',   '>=', $date);
-                }
+                $date = Carbon::parse($request->query("date"))->toDateTimeString();
+                $ujianQuery->where('ujians.start_date', '<=', $date)
+                           ->where('ujians.end_date', '>=', $date);
             }
-            // if ($request->query("end_date")) {
-            //     $ujian->where("end_date", "<=", $request->query("end_date"));
-            // }
             if ($request->query("kelas_id")) {
-                $ujian->where("kelas_id",'=', $request->query("kelas_id"));
+                $ujianQuery->where("ujians.kelas_id", $request->query("kelas_id"));
             }
-            // dd($request->query('kelas_id'));
     
-            $ujian->with("kelompok_ujian");
-            $ujian->with("mapel");
-            $ujian->with("kelas");
+            // Eager load relationships
+            $ujianQuery->with(["kelompok_ujian", "mapel", "kelas"]);
     
-            // Date transformation remains the same
-            $ujian->get()->transform(function ($item) {
-                $item->start_date = \Carbon\Carbon::parse($item->start_date)->toIso8601String();
-                $item->end_date = \Carbon\Carbon::parse($item->end_date)->toIso8601String();
+            // Transform dates in paginated results
+            $paginated = $ujianQuery->paginate($per_page);
+            $paginated->getCollection()->transform(function ($item) {
+                $item->start_date = Carbon::parse($item->start_date)->toIso8601String();
+                $item->end_date = Carbon::parse($item->end_date)->toIso8601String();
                 return $item;
             });
-            
-            $per_page = $request->query("limit") ?? 10;
-            // dd($ujian->paginate($per_page));
-            return response()->json($ujian->paginate($per_page));
+    
+            return response()->json($paginated);
+    
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
         }
