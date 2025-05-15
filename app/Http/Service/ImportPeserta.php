@@ -6,6 +6,7 @@ use App\Models\Jurusan;
 use App\Models\Peserta;
 use App\Models\Agama;
 use App\Models\Daftar_Kelas;
+use App\Models\Tingkatan;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,7 +15,7 @@ class ImportPeserta implements ToModel
     public function model(array $row)
     {
         // Check if the row is empty
-        if (empty($row[0])) {
+        if (empty($row[0])|| $row[0] == "nomor_peserta") {
             return null; // Skip empty rows
         }
 
@@ -54,6 +55,19 @@ class ImportPeserta implements ToModel
             // $kelas_id = null; // Set to null if not found
         }
 
+        $tingkatan_id = substr($row[4], 0, 1);
+        $tingkatan_id = Tingkatan::where('nama', $tingkatan_id)->first();
+        if ($tingkatan_id) {
+            $tingkatan_id = $tingkatan_id->id;
+        } else {
+            $tingkatan_id = substr($row[4], 0, 1);
+            if ($tingkatan_id){
+            Tingkatan::create(['nama' => $tingkatan_id]); // Create a new tingkatan if not found
+            $tingkatan_id = Tingkatan::where('nama', $tingkatan_id)->first()->id; // Get the newly created tingkatan ID
+            // $tingkatan_id = null; // Set to null if not found
+            }
+        }
+
         // dd([
         //     'nomor_peserta' => $row[0],
         //     'password' => Hash::make($row[1]),
@@ -66,9 +80,10 @@ class ImportPeserta implements ToModel
            
         return new Peserta([
             'nomor_peserta' => $row[0],
-            'password' => Hash::make($row[1]),
+            'password' => $row[1],
             'nama' => $row[2],
             'alamat' => $row[3],
+            'tingkatan_id' => $tingkatan_id,
             'kelas_id' => $kelas_id,
             'jurusan_id' => $jurusan_id,
             'agama_id' => $agama_id,

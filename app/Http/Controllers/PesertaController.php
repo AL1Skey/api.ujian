@@ -24,11 +24,15 @@ class PesertaController extends Controller
             if ($request->query("nomor_peserta")) {
                 $peserta->where("nomor_peserta", $request->query("nomor_peserta"));
             }
+
+            $totalPeserta = $peserta->count();
+            
             $peserta->with("jurusan");
             $peserta->with("agama");
             $peserta->with("kelas");
+            $peserta->with("tingkatan");
 
-            return response()->json($peserta->paginate(10));
+            return response()->json($request->query("all") ? $peserta->paginate($totalPeserta):$peserta->paginate(10));
         } catch (\Exception $e) {
             Log::error('Error fetching peserta list', ['error' => $e->getMessage()]);
             return response()->json(["error" => $e->getMessage()], 400);
@@ -83,7 +87,7 @@ class PesertaController extends Controller
                 }
             }
 
-            $data['password'] = Hash::make($data['password']);
+            // $data['password'] = Hash::make($data['password']);
             $peserta = Peserta::create($data);
             Log::info('Peserta created', ['id' => $peserta->id]);
             return response()->json($peserta, 201);
@@ -125,7 +129,7 @@ class PesertaController extends Controller
             $data = $this->handleRequest($request);
             
             if ($request->password) {
-                $data['password'] = Hash::make($data['password']);
+                // $data['password'] = Hash::make($data['password']);
             }
 
             $peserta->update($data);

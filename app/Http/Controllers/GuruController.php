@@ -50,7 +50,7 @@ class GuruController extends Controller
             ]);
             
             $data = $this->handleRequest($request);
-            $data['password'] = Hash::make($data['password']);
+            // $data['password'] = Hash::make($data['password']);
             $guru = Guru::create($data);
             return response()->json($guru, 201);
         } catch (\Exception $e) {
@@ -92,7 +92,7 @@ class GuruController extends Controller
             ]);
             $data = $this->handleRequest($request);
             $guru = Guru::find($id);
-            $data['password'] = Hash::make($data['password']);
+            // $data['password'] = Hash::make($data['password']);
             $guru->update($data);
             return response()->json([
                 'message' => 'Data updated',

@@ -21,7 +21,7 @@ JWTSubject
     //
     use Authenticatable, Authorizable, CanResetPassword;
     protected $table = 'pesertas';
-    protected $fillable = ['nomor_peserta', 'password', 'nama', 'alamat', 'kelas_id', 'jurusan_id', 'agama_id'];
+    protected $fillable = ['nomor_peserta', 'password', 'nama', 'alamat', 'kelas_id','tingkatan_id', 'jurusan_id', 'agama_id'];
 
     // Get the name of the unique identifier for the user
     public function getAuthIdentifierName()
@@ -80,6 +80,11 @@ JWTSubject
     public function kelas()
     {
         return $this->belongsTo(Daftar_Kelas::class);
+    }
+
+    public function tingkatan()
+    {
+        return $this->belongsTo(Tingkatan::class);
     }
 
     public function jurusan()

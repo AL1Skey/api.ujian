@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kelompok_Ujian;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class KelompokUjianController extends Controller
@@ -41,10 +42,17 @@ class KelompokUjianController extends Controller
             $request->validate([
                 'nama' => 'required|string',
                 'id_sekolah' => '',
-                'start_date' => 'date',
-                'end_date' => 'date',
+                // 'start_date' => 'date',
+                // 'end_date' => 'date',
             ]);
+            
             $data = $this->handleRequest($request);
+            if (isset($data['start_date'])) {
+                $data['start_date'] = Carbon::parse($data['start_date'])->format('Y-m-d');
+            }
+            if (isset($data['end_date'])) {
+                $data['end_date'] = Carbon::parse($data['end_date'])->format('Y-m-d');
+            }
             $kelompok_ujian = Kelompok_Ujian::create($data);
             return response()->json($kelompok_ujian);
         } catch (\Exception $e) {
@@ -81,10 +89,16 @@ class KelompokUjianController extends Controller
             $request->validate([
                 'nama' => 'required|string',
                 'id_sekolah' => 'string',
-                'start_date' => 'date',
-                'end_date' => 'date',
+                // 'start_date' => 'date',
+                // 'end_date' => 'date',
             ]);
             $data = $this->handleRequest($request);
+            if (isset($data['start_date'])) {
+                $data['start_date'] = Carbon::parse($data['start_date'])->format('Y-m-d');
+            }
+            if (isset($data['end_date'])) {
+                $data['end_date'] = Carbon::parse($data['end_date'])->format('Y-m-d');
+            }
             $kelompok_ujian = Kelompok_Ujian::find($id);
             $kelompok_ujian->update($data);
             return response()->json($kelompok_ujian);
@@ -102,6 +116,11 @@ class KelompokUjianController extends Controller
         try {
             $kelompok_ujian = Kelompok_Ujian::find($id);
             if ($kelompok_ujian) {
+                // Check if the kelompok_ujian is used in the ujian table
+                // $ujian = \App\Models\Ujian::where('kelompok_id', $kelompok_ujian->id)->first();
+                // if ($ujian) {
+                //     $ujian->delete();
+                // }
                 $kelompok_ujian->delete();
                 return response()->json(['message' => 'Data deleted']);
             }

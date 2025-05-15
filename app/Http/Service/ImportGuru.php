@@ -40,7 +40,7 @@ class ImportGuru implements ToModel
 
         return new Guru([
             'username' => $row[0],
-            'password' => Hash::make($row[1]),
+            'password' => $row[1],
             'nama' => $row[2],
             'alamat' => $row[3],
             'role' => strtoupper($row[4]),

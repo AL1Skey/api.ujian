@@ -18,6 +18,8 @@ return new class extends Migration {
             $table->foreign('mapel_id')->references('id')->on('mapels')->nullOnDelete()->cascadeOnUpdate();
             $table->unsignedBigInteger('kelas_id')->nullable();
             $table->foreign('kelas_id')->references('id')->on('daftar__kelas')->nullOnDelete()->cascadeOnUpdate();
+            $table->unsignedBigInteger('tingkatan_id')->nullable();
+            $table->foreign('tingkatan_id')->references('id')->on('tingkatans')->nullOnDelete()->cascadeOnUpdate();
             $table->string('nama');
             $table->string('id_sekolah')->nullable();
             $table->timestamp('start_date')->nullable();

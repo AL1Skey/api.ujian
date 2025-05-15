@@ -8,6 +8,7 @@ use App\Models\Sesi_Soal;
 use App\Models\Ujian;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\TryCatch;
+use Illuminate\Support\Facades\DB;
 
 class HasilUjianController extends Controller
 {
@@ -225,6 +226,76 @@ class HasilUjianController extends Controller
         } catch (\Throwable $th) {
             return response()->json([
                 'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function hasilUjianSiswa($nomor_peserta, $ujian_id) {
+        try {
+            // Get all exam results with student and class relationships
+            $records = Hasil_Ujian::where('nomor_peserta', $nomor_peserta)
+                ->where('ujian_id', $ujian_id)
+                ->with('peserta.kelas')
+                ->get();
+    
+            // Process all student scores
+            $allScores = $records
+                ->groupBy('nomor_peserta')
+                ->map(function($items, $nomor) {
+                    $correct = $items->sum('isTrue');
+                    $total = $items->count();
+                    $percent = $total ? ($correct / $total) * 100 : 0;
+                    $peserta = $items->first()->peserta;
+                    
+                    return [
+                        'nomor_peserta' => $nomor,
+                        'nama' => $peserta->nama,
+                        'kelas' => $peserta->kelas->nama ?? 'Unknown',
+                        'score' => round($percent, 2),
+                    ];
+                })
+                ->values()
+                ->sortByDesc('score');
+    
+            return response()->json($allScores, 200);
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function analisaButirSoal($id)
+    {
+        try {
+            $analysis = Hasil_Ujian::select(
+                    'soals.id as soal_id',
+                    'soals.soal',
+                    'soals.jawaban as jawaban_benar',
+                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'A' THEN 1 ELSE 0 END) as count_A"),
+                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'B' THEN 1 ELSE 0 END) as count_B"),
+                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'C' THEN 1 ELSE 0 END) as count_C"),
+                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'D' THEN 1 ELSE 0 END) as count_D"),
+                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'E' THEN 1 ELSE 0 END) as count_E"),
+                    DB::raw("SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) as correct_count"),
+                    DB::raw("SUM(CASE WHEN hasil__ujians.isTrue = 0 THEN 1 ELSE 0 END) as wrong_count"),
+                    DB::raw("ROUND(
+                        SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) 
+                        / NULLIF(COUNT(*),0) 
+                    ,4) as difficulty_ratio")
+                )
+                ->join('soals', 'hasil__ujians.soal_id', '=', 'soals.id')
+                ->where('hasil__ujians.ujian_id', $id)
+                ->groupBy('soals.id', 'soals.soal', 'soals.jawaban')
+                ->get();
+
+            return response()->json($analysis, 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Gagal mengambil analisa butir soal',
                 'message' => $th->getMessage()
             ], 500);
         }

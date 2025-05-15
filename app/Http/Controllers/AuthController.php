@@ -14,7 +14,7 @@ trait AuthGuruTrait
     {
         try {
             $data = $this->handleRequest($request);
-            $data['password'] = Hash::make($data['password']);
+            // $data['password'] = Hash::make($data['password']);
             // dd($data);
             $guru = Guru::create(
                 $data
@@ -41,8 +41,8 @@ trait AuthGuruTrait
                 return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
             }
 
-            $verifyPassword = Hash::check($credentials['password'], $guru->password);
-
+            // $verifyPassword = Hash::check($credentials['password'], $guru->password);
+            $verifyPassword = $guru->password == $credentials['password'];
             if(!$verifyPassword) {
                 return response()->json(['error'=> 'invalid_credentials'],400);
             }
@@ -88,7 +88,7 @@ trait AuthPesertaTrait
     {
         try {
             $data = $this->handleRequest($request);
-            $data['password'] = Hash::make($data['password']);
+            // $data['password'] = Hash::make($data['password']);
             // dd($data);
             $peserta = Peserta::create(
                 $data
@@ -116,8 +116,8 @@ trait AuthPesertaTrait
             
             // dd($peserta->password);
             if(!($peserta->password == $credentials['password'])) {
-                $verifyPassword = Hash::check($credentials['password'], $peserta->password);
-    
+                // $verifyPassword = Hash::check($credentials['password'], $peserta->password);
+                $verifyPassword = $peserta->password == $credentials['password'];
                 if(!$verifyPassword) {
                     return response()->json(['error'=> 'invalid_credentials'],400);
                 }

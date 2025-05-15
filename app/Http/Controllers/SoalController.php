@@ -109,12 +109,12 @@ class SoalController extends Controller
                 "ujian_id" => "required|integer",
                 "soal" => "required|string",
                 "tipe_soal" => "required|string",
-                "pilihan_a" => "string",
-                "pilihan_b" => "string",
-                "pilihan_c" => "string",
-                "pilihan_d" => "string",
-                "pilihan_e" => "string",
-                "jawaban" => "string",
+                // "pilihan_a" => "string",
+                // "pilihan_b" => "string",
+                // "pilihan_c" => "string",
+                // "pilihan_d" => "string",
+                // "pilihan_e" => "string",
+                // "jawaban" => "string",
             ]);
             $data = $this->handleRequest($request);
            //dd($data);

@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AgamaController;
 use App\Http\Controllers\DaftarKelasController;
+use App\Http\Controllers\TingkatanController;
 use App\Http\Controllers\GuruController;
 use App\Http\Controllers\JurusanController;
 use App\Http\Controllers\KelompokUjianController;
@@ -111,6 +112,13 @@ Route::prefix("/admin")->group(function () {
         Route::put("/daftar_kelas/{id}", [DaftarKelasController::class, "update"]);
         Route::delete("/daftar_kelas/{id}", [DaftarKelasController::class, "destroy"]);
 
+        // Tingkat Kelas
+        Route::get("/tingkatan", [TingkatanController::class, "index"]);
+        Route::get("/tingkatan/{id}", [TingkatanController::class, "show"]);
+        Route::post("/tingkatan", [TingkatanController::class, "store"]);
+        Route::put("/tingkatan/{id}", [TingkatanController::class, "update"]);
+        Route::delete("/tingkatan/{id}", [TingkatanController::class, "destroy"]);
+
         // Sesi Ujian
         Route::get("/sesi_ujian", [SesiUjianController::class, "index"]);
         Route::get("/sesi_ujian/{id}", [SesiUjianController::class, "show"]);
@@ -129,7 +137,13 @@ Route::prefix("/admin")->group(function () {
         Route::get("/hasil_ujian", [HasilUjianController::class, "index"]);
         Route::get("/hasil_ujian/show/{id}",[HasilUjianController::class, "show"]);
         Route::put("/hasil_ujian/update/{id}",[HasilUjianController::class,"update"]);
+        
+        Route::get("/hasil_ujian/siswa/{nomor_peserta}/ujian/{ujian_id}",[HasilUjianController::class,"hasilUjianSiswa"]);
+        
         Route::get("/hasil_ujian/analysis/{id}",[HasilUjianController::class,"hasilUjianAnalysis"]);
+        Route::get("/hasil_ujian/analisa_butir_soal/{id}",[HasilUjianController::class,"analisaButirSoal"]);
+
+
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);
         Route::get("/hasil_ujian/reevaluate", [HasilUjianController::class, "reevaluate"]);
     });

@@ -38,6 +38,7 @@ class UjianController extends Controller
             $ujian->with("kelompok_ujian");
             $ujian->with("mapel");
             $ujian->with("kelas");
+            $ujian->with("tingkatan");
 
             // Convert start_date and end_date to ISO format
             $ujian->get()->transform(function ($item) {
@@ -90,6 +91,12 @@ class UjianController extends Controller
             }
             if ($request->query("kelas_id")) {
                 $ujianQuery->where("ujians.kelas_id", $request->query("kelas_id"));
+            }
+            if ($request->query("status")) {
+                $ujianQuery->where("ujians.status", $request->query("status"));
+            }
+            if ($request->query('tingkatan_id')) {
+                $ujianQuery->where('ujians.tingkatan_id', $request->query('tingkatan_id'));
             }
     
             // Eager load relationships
@@ -153,13 +160,22 @@ class UjianController extends Controller
                 'kelompok_id' => 'required|integer',
                 'mapel_id' => 'required|integer',
                 'kelas_id' => 'required|integer',
+                'tingkatan_id' => 'nullable',
                 'nama' => 'required|string',
                 'id_sekolah' => 'required|integer',
-                'start_date' => 'required|date',
-                'end_date' => 'required|date',
+                // 'start_date' => 'date',
+                // 'end_date' => 'date',
                 'status' => 'required|string'
             ]);
             $data = $this->handleRequest($request);
+            
+            // Ensure dates are in the correct format
+            if (isset($data['start_date'])) {
+                $data['start_date'] = Carbon::parse($data['start_date'])->format('Y-m-d');
+            }
+            if (isset($data['end_date'])) {
+                $data['end_date'] = Carbon::parse($data['end_date'])->format('Y-m-d');
+            }
             $check_kelompok = Kelompok_Ujian::query()->find($request->kelompok_id);
             if(!$check_kelompok) {
                 $data['kelompok_id'] = null;
@@ -172,6 +188,7 @@ class UjianController extends Controller
             if(!$check_kelas) {
                 $data['kelas_id'] = null;
             }
+
 
             $ujian = Ujian::create($data);
             return response()->json($ujian, 201);
@@ -216,15 +233,21 @@ class UjianController extends Controller
                 'kelompok_id' => 'integer',
                 'mapel_id' => 'integer',
                 'kelas_id' => 'integer',
+                'tingkatan_id' => 'nullable',
                 'nama' => 'string',
                 'id_sekolah' => 'integer',
-                'start_date' => 'date',
-                'end_date' => 'date',
+                // 'start_date' => 'date',
+                // 'end_date' => 'date',
                 'status' => 'string'
             ]);
 
             $data = $this->handleRequest($request);
-
+            if (isset($data['start_date'])) {
+                $data['start_date'] = Carbon::parse($data['start_date'])->format('Y-m-d');
+            }
+            if (isset($data['end_date'])) {
+                $data['end_date'] = Carbon::parse($data['end_date'])->format('Y-m-d');
+            }
             $ujian->fill($data);
             $ujian->save();
             return response()->json($ujian, 200);

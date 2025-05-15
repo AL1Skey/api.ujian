@@ -15,41 +15,56 @@ abstract class Controller
 
     public function handleRequest(Request $request)
     {
-        $data = $request->all();
-        foreach ($data as $key => $value) {
-            /*
-            if (is_string($value)) {
-                $data[$key] = $this->sanitizeInput($value);
-            }
-            if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
-                $data[$key] = date(DATE_ISO8601, strtotime($value));
-            }
-            */
-            // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
-                //     $data[$key] = new \DateTime($value);
+        try{
+            $data = $request->all();
+            foreach ($data as $key => $value) {
+                /*
+                if (is_string($value)) {
+                    $data[$key] = $this->sanitizeInput($value);
+                }
+                if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
+                    $data[$key] = date(DATE_ISO8601, strtotime($value));
+                }
+                */
+                // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
+                    //     $data[$key] = new \DateTime($value);
+                    // }
+                // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
+                //     // Parse the incoming datetime (with any timezone info) and normalize to UTC ISO 8601
+                //     $data[$key] = \Carbon\Carbon::parse($value)
+                //         ->utc()
+                //         ->toIso8601String();
                 // }
-            // if (in_array($key, ['start_date', 'end_date']) && strtotime($value)) {
-            //     // Parse the incoming datetime (with any timezone info) and normalize to UTC ISO 8601
-            //     $data[$key] = \Carbon\Carbon::parse($value)
-            //         ->utc()
-            //         ->toIso8601String();
-            // }
+                        
+                if ($key === 'image' ) {
+                    //$fileName = 'blob_' . time() . '.png'; // Adjust the file extension as needed
+                    //Storage::put('public/files/' . $fileName, base64_decode($value));
+                    //dd($value);
+                    if($this->isBlobString($value)){
+                    $fileName = $this->saveBase64File($value,"files" );
+                    $data['image'] = $fileName;
+                    }
+                    else if($value){
+                        unset($data['image']);
+                    }
+                }
+    
+                if (strpos($key, 'pilihan') !== false) {
+                    if($this->isBlobString($value)){
+                        $fileName = $this->saveBase64File($value,"files" );
+                        $data[$key] = $fileName;
+                    }
                     
-            if ($key === 'image' ) {
-                //$fileName = 'blob_' . time() . '.png'; // Adjust the file extension as needed
-                //Storage::put('public/files/' . $fileName, base64_decode($value));
-                //dd($value);
-                if($this->isBlobString($value)){
-                $fileName = $this->saveBase64File($value,"files" );
-                $data['image'] = $fileName;
                 }
-                else if($value){
-                    unset($data['image']);
-                }
+               
             }
-           
+            return $data;
+
         }
-        return $data;
+        catch (\Exception $e) {
+            // Handle the exception as needed
+            return response()->json(['error' => 'An error occurred while processing the request.','message'=> $e->getMessage()], 500);
+        }
     }
     
     private function isBlobString($value)

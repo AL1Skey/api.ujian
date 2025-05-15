@@ -8,7 +8,7 @@ class Ujian extends Model
 {
     //
     protected $table = 'ujians';
-    protected $fillable = ['id','kelompok_id','mapel_id','kelas_id','nama','id_sekolah','start_date','end_date','duration','status'];
+    protected $fillable = ['id','kelompok_id','mapel_id','kelas_id','tingkatan_id','nama','id_sekolah','start_date','end_date','duration','status'];
 
     public function kelompok_ujian()
     {
@@ -36,6 +36,11 @@ class Ujian extends Model
     public function kelas()
     {
         return $this->belongsTo('App\Models\Daftar_Kelas','kelas_id');
+    }
+
+    public function tingkatan()
+    {
+        return $this->belongsTo('App\Models\Tingkatan','tingkatan_id');
     }
     
 }

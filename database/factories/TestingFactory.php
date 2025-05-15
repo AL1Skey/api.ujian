@@ -303,13 +303,18 @@ class TestingFactory extends Factory
             'soal_id'       => fake()->randomElement($soalIds)
         ]);
         $sesiSoalId = \DB::table('sesi__soals')->insertGetId($sesiSoalData);
-    
+        
+        $soalData = \DB::table('soals')->where('id', $sesiSoalData['soal_id'])->first();
+
         \DB::table('hasil__ujians')->insert(
             array_merge($this->hasilUjian(), [
                 'nomor_peserta' => $sesiSoalData['nomor_peserta'],
                 'ujian_id'      => $sesiSoalData['ujian_id'],
                 'soal_id'       => $sesiSoalData['soal_id'],
                 'sesi_soal_id'  => $sesiSoalId,
+                'tipe_soal'     => $sesiSoalData['tipe_soal'],
+                'jawaban_soal' => $soalData->jawaban,
+                'jawaban_sesi'  => $sesiSoalData['jawaban'],
             ])
         );
     });
