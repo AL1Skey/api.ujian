@@ -142,6 +142,8 @@ Route::prefix("/admin")->group(function () {
         
         Route::get("/hasil_ujian/analysis/{id}",[HasilUjianController::class,"hasilUjianAnalysis"]);
         Route::get("/hasil_ujian/analisa_butir_soal/{id}",[HasilUjianController::class,"analisaButirSoal"]);
+        Route::get("/hasil_ujian/ujian/{ujian_id}/kelas/{kelas_id}",[HasilUjianController::class,"hasilUjianSiswaByUjianKelas"]);
+        Route::get("/hasil_ujian/ujian/{ujian_id}",[HasilUjianController::class,"hasilUjianSiswaByUjian"]);
 
 
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);

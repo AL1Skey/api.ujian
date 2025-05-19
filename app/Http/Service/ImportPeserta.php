@@ -50,17 +50,21 @@ class ImportPeserta implements ToModel
         if ($kelas_id) {
             $kelas_id = $kelas_id->id;
         } else {
-            Daftar_Kelas::create(['nama' => strtoupper($row[4])]); // Create a new kelas if not found
+            $tingkatan_id = explode(' ', trim($row[4]))[0];
+            Daftar_Kelas::create([
+                'nama' => strtoupper($row[4]),
+                'tingkatan' => $tingkatan_id,
+            ]); // Create a new kelas if not found
             $kelas_id = Daftar_Kelas::where('nama', strtoupper($row[4]))->first()->id; // Get the newly created kelas ID
             // $kelas_id = null; // Set to null if not found
         }
 
-        $tingkatan_id = substr($row[4], 0, 1);
+        $tingkatan_id = explode(' ', trim($row[4]))[0];
         $tingkatan_id = Tingkatan::where('nama', $tingkatan_id)->first();
         if ($tingkatan_id) {
             $tingkatan_id = $tingkatan_id->id;
         } else {
-            $tingkatan_id = substr($row[4], 0, 1);
+            $tingkatan_id = explode(' ', trim($row[4]))[0];
             if ($tingkatan_id){
             Tingkatan::create(['nama' => $tingkatan_id]); // Create a new tingkatan if not found
             $tingkatan_id = Tingkatan::where('nama', $tingkatan_id)->first()->id; // Get the newly created tingkatan ID

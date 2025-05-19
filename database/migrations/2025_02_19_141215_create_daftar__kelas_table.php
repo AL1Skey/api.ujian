@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('daftar__kelas', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
+            $table->string('tingkatan')->nullable();
             $table->timestamps();
         });
     }

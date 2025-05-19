@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('tingkatan_id')->nullable();
             $table->foreign('tingkatan_id')->references('id')->on('tingkatans')->nullOnDelete()->cascadeOnUpdate();
             $table->string('nama');
+            $table->string('password')->nullable();
             $table->string('id_sekolah')->nullable();
             $table->timestamp('start_date')->nullable();
             $table->timestamp('end_date')->nullable();

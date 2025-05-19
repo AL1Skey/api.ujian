@@ -148,7 +148,7 @@ class HasilUjianController extends Controller
                 ->sortByDesc('score');
     
             // Get top 5 students
-            $topStudents = $allScores->take(5);
+            $topStudents = $allScores->take(5)->values();
     
             // Calculate class statistics
             $classAnalysis = $allScores
@@ -238,6 +238,102 @@ class HasilUjianController extends Controller
                 ->where('ujian_id', $ujian_id)
                 ->with('peserta.kelas')
                 ->get();
+            // Process all student scores
+            $allScores = $records
+                ->groupBy('nomor_peserta')
+                ->map(function($items, $nomor) {
+                    $correct = $items->sum('isTrue');
+                    $total = $items->count();
+                    $percent = $total ? ($correct / $total) * 100 : 0;
+                    $peserta = $items->first()->peserta;
+                    $benar = $items->where('isTrue', 1)->count();
+                    $salah = $items->where('isTrue', 0)->count();
+                    return [
+                        'nomor_peserta' => $nomor,
+                        'nama' => $peserta->nama,
+                        'kelas' => $peserta->kelas->nama ?? 'Unknown',
+                        'benar' => $benar,
+                        'salah' => $salah,
+                        'score' => round($percent, 2),
+                        'hasil_ujian' => $items
+                    ];
+                })
+                ->values()
+                ->sortByDesc('nama');
+    
+            return response()->json($allScores, 200);
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function hasilUjianSiswaByUjian(Request $request,$ujian_id) {
+        try {
+            // Get all exam results with student and class relationships
+            $records = Hasil_Ujian::where('ujian_id', $ujian_id);
+            if($request->query('kelas_id')){
+                $kelas_id = $request->query('kelas_id');
+                $records->with(['peserta.kelas' => function($query) use ($kelas_id) {
+                    $query->where('id', $kelas_id);
+                }]);
+            }
+            if($request->query('tingkatan_id')){
+                $tingkatan_id = $request->query('tingkatan_id');
+                $records->with(['peserta.tingkatan' => function($query) use ($tingkatan_id) {
+                    $query->where('id', $tingkatan_id);
+                }]);
+            }
+            $records = $records->get();
+            // dd($records);
+            // Process all student scores
+            $allScores = $records
+                ->groupBy('nomor_peserta')
+                ->map(function($items, $nomor) {
+                    $correct = $items->sum('isTrue');
+                    $total   = $items->count();
+                    $percent = $total ? ($correct / $total) * 100 : 0;
+                    $peserta = $items->first()->peserta;
+                    $benar   = $items->where('isTrue', 1)->count();
+                    $salah   = $items->where('isTrue', 0)->count();
+
+                    return [
+                        'nomor_peserta' => $nomor,
+                        'nama'          => $peserta->nama,
+                        'kelas'         => $peserta->kelas->nama ?? 'Unknown',
+                        'benar'         => $benar,
+                        'salah'         => $salah,
+                        'score'         => round($percent, 2),
+                        // 'hasil_ujian'   => $items,
+                    ];
+                })
+                ->sortBy('nama')
+                ->values()
+                ->all();  // <-- pull out a pure PHP array here
+
+            return response()->json($allScores, 200);
+    
+            // return response()->json($allScores, 200);
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function hasilUjianSiswaByUjianKelas($ujian_id, $kelas_id) {
+        try {
+            // Get all exam results with student and class relationships
+            $records = Hasil_Ujian::where('ujian_id', $ujian_id)
+                ->with(['peserta.kelas' => function($query) use ($kelas_id) {
+                    $query->where('id', $kelas_id);
+                }])
+                ->get();
     
             // Process all student scores
             $allScores = $records
@@ -253,10 +349,12 @@ class HasilUjianController extends Controller
                         'nama' => $peserta->nama,
                         'kelas' => $peserta->kelas->nama ?? 'Unknown',
                         'score' => round($percent, 2),
+                        'hasil_ujian' => $items
                     ];
                 })
                 ->values()
-                ->sortByDesc('score');
+                ->sortByDesc('score')
+                ;
     
             return response()->json($allScores, 200);
     
@@ -268,6 +366,10 @@ class HasilUjianController extends Controller
         }
     }
 
+    
+    
+
+
     public function analisaButirSoal($id)
     {
         try {
@@ -275,17 +377,21 @@ class HasilUjianController extends Controller
                     'soals.id as soal_id',
                     'soals.soal',
                     'soals.jawaban as jawaban_benar',
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'A' THEN 1 ELSE 0 END) as count_A"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'B' THEN 1 ELSE 0 END) as count_B"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'C' THEN 1 ELSE 0 END) as count_C"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'D' THEN 1 ELSE 0 END) as count_D"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'E' THEN 1 ELSE 0 END) as count_E"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'a' THEN 1 ELSE 0 END) as count_A"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'b' THEN 1 ELSE 0 END) as count_B"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'c' THEN 1 ELSE 0 END) as count_C"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'd' THEN 1 ELSE 0 END) as count_D"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'e' THEN 1 ELSE 0 END) as count_E"),
                     DB::raw("SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) as correct_count"),
                     DB::raw("SUM(CASE WHEN hasil__ujians.isTrue = 0 THEN 1 ELSE 0 END) as wrong_count"),
+                    // DB::raw("ROUND(
+                    //     SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) 
+                    //     / NULLIF(COUNT(*),0) 
+                    // ,4) as difficulty_ratio")
                     DB::raw("ROUND(
-                        SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) 
-                        / NULLIF(COUNT(*),0) 
-                    ,4) as difficulty_ratio")
+                        SUM(CASE WHEN hasil__ujians.isTrue = 0 THEN 1 ELSE 0 END) 
+                        / NULLIF(COUNT(*), 0), 4) as difficulty_ratio")
+                    
                 )
                 ->join('soals', 'hasil__ujians.soal_id', '=', 'soals.id')
                 ->where('hasil__ujians.ujian_id', $id)
@@ -353,3 +459,55 @@ class HasilUjianController extends Controller
         //
     }
 }
+
+
+
+
+
+
+
+
+
+
+// Backup
+
+
+    // public function hasilUjianSiswaByUjianKelas($ujian_id, $kelas_id) {
+    //     try {
+    //         // Get all exam results with student and class relationships
+    //         $records = Hasil_Ujian::where('ujian_id', $ujian_id)
+    //             ->with(['peserta.kelas' => function($query) use ($kelas_id) {
+    //                 $query->where('id', $kelas_id);
+    //             }])
+    //             ->get();
+    
+    //         // Process all student scores
+    //         $allScores = $records
+    //             ->groupBy('nomor_peserta')
+    //             ->map(function($items, $nomor) {
+    //                 $correct = $items->sum('isTrue');
+    //                 $total = $items->count();
+    //                 $percent = $total ? ($correct / $total) * 100 : 0;
+    //                 $peserta = $items->first()->peserta;
+                    
+    //                 return [
+    //                     'nomor_peserta' => $nomor,
+    //                     'nama' => $peserta->nama,
+    //                     'kelas' => $peserta->kelas->nama ?? 'Unknown',
+    //                     'score' => round($percent, 2),
+    //                     'hasil_ujian' => $items
+    //                 ];
+    //             })
+    //             ->values()
+    //             ->sortByDesc('score')
+    //             ;
+    
+    //         return response()->json($allScores, 200);
+    
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'error' => 'Server error',
+    //             'message' => $th->getMessage()
+    //         ], 500);
+    //     }
+    // }

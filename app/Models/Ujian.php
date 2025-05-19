@@ -8,7 +8,7 @@ class Ujian extends Model
 {
     //
     protected $table = 'ujians';
-    protected $fillable = ['id','kelompok_id','mapel_id','kelas_id','tingkatan_id','nama','id_sekolah','start_date','end_date','duration','status'];
+    protected $fillable = ['id','kelompok_id','mapel_id','kelas_id','tingkatan_id','nama','password','id_sekolah','start_date','end_date','duration','status'];
 
     public function kelompok_ujian()
     {
