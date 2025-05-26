@@ -196,6 +196,27 @@ class SoalController extends Controller
         }
     }
 
+    public function destroyByUjian($ujian_id)
+    {
+        //
+        try{
+            if(!$ujian_id) {
+                return response()->json(["error" => "ujian_id tidak boleh kosong"], 400);
+            }
+            $soal = Soal::where("ujian_id", $ujian_id);
+
+            if($soal->count() == 0) {
+                return response()->json(["message" => "Tidak ada soal yang ditemukan untuk ujian_id $ujian_id"], 404);
+            }
+
+            $soal->delete();
+            return response()->json(["message" => "Soal dengan ujian_id $ujian_id telah dihapus"]);
+        }
+        catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
+    }
+
     /**
      * Handle the request data for storing or updating.
      * 

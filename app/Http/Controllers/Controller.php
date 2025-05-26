@@ -54,6 +54,9 @@ abstract class Controller
                         $fileName = $this->saveBase64File($value,"files" );
                         $data[$key] = $fileName;
                     }
+                    else if($this->isBase64($value)){
+                        $data[$key] = base64_decode($value);
+                    }
                     
                 }
                
@@ -67,6 +70,13 @@ abstract class Controller
         }
     }
     
+    private function isBase64($string) {
+        // Check if the string is valid Base64
+        $decoded = base64_decode($string, true);
+        // Ensure the string is both decodable and re-encodable
+        return $decoded !== false && base64_encode($decoded) === $string;
+    }
+
     private function isBlobString($value)
     {
         // Check if the value is a base64-encoded string

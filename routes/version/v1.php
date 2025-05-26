@@ -96,6 +96,7 @@ Route::prefix("/admin")->group(function () {
         Route::delete("/soal/{id}", [SoalController::class, "destroy"]);
 
         Route::post("/import-soal",[SoalController::class,"import"]);
+        // Route::delete("/delete-soal-by-ujian/{ujian_id}", [SoalController::class, "destroyByUjian"]);
 
         // Ujian
         Route::get("/ujian", [UjianController::class, "index"]);

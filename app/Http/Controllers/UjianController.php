@@ -93,7 +93,7 @@ class UjianController extends Controller
             if ($request->query("kelas_id")) {
                 $ujianQuery->where("ujians.kelas_id", $request->query("kelas_id"));
             }
-            if ($request->query("status")) {
+            if ($request->has("status")) {
                 $ujianQuery->where("ujians.status", $request->query("status"));
             }
             if ($request->query('tingkatan_id')) {
