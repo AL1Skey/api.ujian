@@ -57,6 +57,9 @@ abstract class Controller
                     else if($this->isBase64($value)){
                         $data[$key] = base64_decode($value);
                     }
+                    if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        unset($data[$key]);
+                    }
                     
                 }
                

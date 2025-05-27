@@ -170,7 +170,9 @@ class SoalController extends Controller
             ]);
             $data = $this->handleRequest($request);
             // return response()->json($data);
-            $data['soal'] = base64_decode($data['soal']);
+            if (isset($data['soal'])) {
+                $data['soal'] = base64_decode($data['soal']);
+            }
             $soal = Soal::findOrFail($id);
             $soal->update($data);
             return response()->json($soal);
