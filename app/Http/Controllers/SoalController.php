@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Soal;
 use Illuminate\Http\Request;
 use App\Models\Ujian;
+use Log;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -157,6 +158,7 @@ class SoalController extends Controller
     {
         //
         try{
+            
             $request->validate([
                 "ujian_id" => "integer",
                 // "soal" => "string",
@@ -170,10 +172,14 @@ class SoalController extends Controller
             ]);
             $data = $this->handleRequest($request);
             // return response()->json($data);
-            if (isset($data['soal'])) {
+            if (isset($data['soal']) && $this->isBase64($data['soal'])) {
                 $data['soal'] = base64_decode($data['soal']);
             }
             $soal = Soal::findOrFail($id);
+            if(!$soal) {
+                return response()->json(["error" => "Soal dengan ID $id tidak ditemukan"], 404);
+            }
+            Log::info("Updating soal with ID $id", $data);
             $soal->update($data);
             return response()->json($soal);
         }

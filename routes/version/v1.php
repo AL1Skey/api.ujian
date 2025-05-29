@@ -90,10 +90,10 @@ Route::prefix("/admin")->group(function () {
 
         // Soal
         Route::get("/soal", [SoalController::class, "indexAll"]);
-        Route::get("/soal/{id}", [SoalController::class, "show"]);
+        Route::get("/soal/show/{id}", [SoalController::class, "show"]);
         Route::post("/soal", [SoalController::class, "store"]);
-        Route::put("/soal/{id}", [SoalController::class, "update"]);
-        Route::delete("/soal/{id}", [SoalController::class, "destroy"]);
+        Route::post("/soal/edit/{id}", [SoalController::class, "update"]);
+        Route::delete("/soal/delete/{id}", [SoalController::class, "destroy"]);
 
         Route::post("/import-soal",[SoalController::class,"import"]);
         // Route::delete("/delete-soal-by-ujian/{ujian_id}", [SoalController::class, "destroyByUjian"]);
