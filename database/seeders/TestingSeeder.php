@@ -12,7 +12,7 @@ class TestingSeeder extends Seeder
     public function run(): void
     {
         $factory = new TestingFactory();
-        $factory->generateAll(10); // Buat 10 data tiap jenis
+        $factory->generateAll(3000); // Buat 10 data tiap jenis
     }
 }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Soal;
 use Illuminate\Http\Request;
 use App\Models\Ujian;
+use Log;
 use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -27,23 +28,39 @@ class SoalController extends Controller
             $paginateResult = $soal->paginate($request->query("limit") ?? 100);
             foreach ($paginateResult->items() as $item) {
                 if($item->image){
-                $item->image = $item->image ? asset('storage/app/public/'.$item->image) : null;
+                $item->image = $item->image ? 
+                
+                // asset('storage/app/public/'.$item->image) 
+                asset('public/storage/'.$item->image) 
+                : null;
                 }
 
                 if ($item->pilihan_a && Str::contains($item->pilihan_a, 'files/')) {
-                    $item->pilihan_a = asset('storage/app/public/' . $item->pilihan_a);
+                    $item->pilihan_a = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_a);
+                    asset('public/storage/' . $item->pilihan_a);
                 }
 
                 if ($item->pilihan_b && Str::contains($item->pilihan_b, 'files/')) {
-                    $item->pilihan_b = asset('storage/app/public/' . $item->pilihan_b);
+                    $item->pilihan_b = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_b);
+                    asset('public/storage/' . $item->pilihan_b);
                 }
 
                 if ($item->pilihan_c && Str::contains($item->pilihan_c, 'files/')) {
-                    $item->pilihan_c = asset('storage/app/public/' . $item->pilihan_c);
+                    $item->pilihan_c = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_c);
+                    asset('public/storage/' . $item->pilihan_c);
                 }
 
                 if ($item->pilihan_d && Str::contains($item->pilihan_d, 'files/')) {
-                    $item->pilihan_d = asset('storage/app/public/' . $item->pilihan_d);
+                    $item->pilihan_d = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_d);
+                    asset('public/storage/' . $item->pilihan_d);
                 }
 
             }
@@ -70,23 +87,39 @@ class SoalController extends Controller
             $paginateResult = $soal->paginate($request->query("limit") ?? 100);
             foreach ($paginateResult->items() as $item) {
                 if($item->image){
-                $item->image = $item->image ? asset('storage/app/public/'.$item->image) : null;
+                $item->image = $item->image ? 
+                
+                // asset('storage/app/public/'.$item->image) 
+                asset('public/storage/'.$item->image) 
+                : null;
                 }
 
                 if ($item->pilihan_a && Str::contains($item->pilihan_a, 'files/')) {
-                    $item->pilihan_a = asset('storage/app/public/' . $item->pilihan_a);
+                    $item->pilihan_a = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_a);
+                    asset('public/storage/' . $item->pilihan_a);
                 }
 
                 if ($item->pilihan_b && Str::contains($item->pilihan_b, 'files/')) {
-                    $item->pilihan_b = asset('storage/app/public/' . $item->pilihan_b);
+                    $item->pilihan_b = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_b);
+                    asset('public/storage/' . $item->pilihan_b);
                 }
 
                 if ($item->pilihan_c && Str::contains($item->pilihan_c, 'files/')) {
-                    $item->pilihan_c = asset('storage/app/public/' . $item->pilihan_c);
+                    $item->pilihan_c = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_c);
+                    asset('public/storage/' . $item->pilihan_c);
                 }
 
                 if ($item->pilihan_d && Str::contains($item->pilihan_d, 'files/')) {
-                    $item->pilihan_d = asset('storage/app/public/' . $item->pilihan_d);
+                    $item->pilihan_d = 
+                    
+                    // asset('storage/app/public/' . $item->pilihan_d);
+                    asset('public/storage/' . $item->pilihan_d);
                 }
 
             }
@@ -141,7 +174,8 @@ class SoalController extends Controller
         try{
             $soal = Soal::findOrFail($id);
             $soal->load("ujian");
-            $soal->image = $soal->image ? asset('public/' . $soal->image) : null;
+            $soal->image = $soal->image ? asset('public/' . $soal->image) 
+            : null;
             return response()->json($soal);
         }
         catch (\Exception $e) {
@@ -157,6 +191,7 @@ class SoalController extends Controller
     {
         //
         try{
+            
             $request->validate([
                 "ujian_id" => "integer",
                 // "soal" => "string",
@@ -170,8 +205,14 @@ class SoalController extends Controller
             ]);
             $data = $this->handleRequest($request);
             // return response()->json($data);
-            $data['soal'] = base64_decode($data['soal']);
+            if (isset($data['soal']) && $this->isBase64($data['soal'])) {
+                $data['soal'] = base64_decode($data['soal']);
+            }
             $soal = Soal::findOrFail($id);
+            if(!$soal) {
+                return response()->json(["error" => "Soal dengan ID $id tidak ditemukan"], 404);
+            }
+            Log::info("Updating soal with ID $id", $data);
             $soal->update($data);
             return response()->json($soal);
         }
@@ -190,6 +231,27 @@ class SoalController extends Controller
             $soal = Soal::findOrFail($id);
             $soal->delete();
             return response()->json($soal);
+        }
+        catch (\Exception $e) {
+            return response()->json(["error" => $e->getMessage()], 400);
+        }
+    }
+
+    public function destroyByUjian($ujian_id)
+    {
+        //
+        try{
+            if(!$ujian_id) {
+                return response()->json(["error" => "ujian_id tidak boleh kosong"], 400);
+            }
+            $soal = Soal::where("ujian_id", $ujian_id);
+
+            if($soal->count() == 0) {
+                return response()->json(["message" => "Tidak ada soal yang ditemukan untuk ujian_id $ujian_id"], 404);
+            }
+
+            $soal->delete();
+            return response()->json(["message" => "Soal dengan ujian_id $ujian_id telah dihapus"]);
         }
         catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);

@@ -15,7 +15,8 @@ abstract class Controller
 
     public function handleRequest(Request $request)
     {
-        try{
+        
+        
             $data = $request->all();
             foreach ($data as $key => $value) {
                 /*
@@ -40,9 +41,17 @@ abstract class Controller
                     //$fileName = 'blob_' . time() . '.png'; // Adjust the file extension as needed
                     //Storage::put('public/files/' . $fileName, base64_decode($value));
                     //dd($value);
-                    if($this->isBlobString($value)){
-                    $fileName = $this->saveBase64File($value,"files" );
-                    $data['image'] = $fileName;
+                    if($value instanceof \Illuminate\Http\UploadedFile) {
+                        // store the uploaded file in storage/app/public/files
+                        $filePath = Storage::disk('public')->putFile('files', $value);
+                        $data['image'] = $filePath;
+                    }
+                    else if($this->isBase64($value)){
+                        $data['image'] = base64_decode($value);
+                    }
+                    else if($this->isBlobString($value)){
+                        $fileName = $this->saveBase64File($value,"files" );
+                        $data['image'] = $fileName;
                     }
                     else if($value){
                         unset($data['image']);
@@ -50,9 +59,20 @@ abstract class Controller
                 }
     
                 if (strpos($key, 'pilihan') !== false) {
-                    if($this->isBlobString($value)){
+                    if ($value instanceof \Illuminate\Http\UploadedFile) {
+                        // store the uploaded file in storage/app/public/files
+                        $filePath = Storage::disk('public')->putFile('files', $value);
+                        $data[$key] = $filePath;
+                    }
+                    else if($this->isBlobString($value)){
                         $fileName = $this->saveBase64File($value,"files" );
                         $data[$key] = $fileName;
+                    }
+                    else if($this->isBase64($value)){
+                        $data[$key] = base64_decode($value);
+                    }
+                    else if (filter_var($value, FILTER_VALIDATE_URL)) {
+                        unset($data[$key]);
                     }
                     
                 }
@@ -60,13 +80,17 @@ abstract class Controller
             }
             return $data;
 
-        }
-        catch (\Exception $e) {
-            // Handle the exception as needed
-            return response()->json(['error' => 'An error occurred while processing the request.','message'=> $e->getMessage()], 500);
-        }
+        
+        
     }
     
+    public function isBase64($string) {
+        // Check if the string is valid Base64
+        $decoded = base64_decode($string, true);
+        // Ensure the string is both decodable and re-encodable
+        return $decoded !== false && base64_encode($decoded) === $string;
+    }
+
     private function isBlobString($value)
     {
         // Check if the value is a base64-encoded string

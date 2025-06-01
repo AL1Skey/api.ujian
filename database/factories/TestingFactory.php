@@ -164,6 +164,8 @@ class TestingFactory extends Factory
     }
 
 
+
+
     // Factory for table: cache
     public function cache(): array
     {
@@ -208,6 +210,7 @@ class TestingFactory extends Factory
         ];
     }
 
+
     // Factory for table: sessions
     public function session(): array
     {
@@ -237,12 +240,12 @@ class TestingFactory extends Factory
     public function generateAll(int $count = 10): void
 {
     // Buat Agama
-    $agamaIds = collect(range(1, $count))->map(function () {
+    $agamaIds = collect(range(1, 10))->map(function () {
         return \DB::table('agamas')->insertGetId($this->agama());
     });
 
     // Buat Mapel
-    $mapelIds = collect(range(1, $count))->map(function () {
+    $mapelIds = collect(range(1, 10))->map(function () {
         return \DB::table('mapels')->insertGetId($this->mapel());
     });
 
@@ -252,17 +255,28 @@ class TestingFactory extends Factory
     });
 
     // Buat Kelas
-    $kelasIds = collect(range(1, $count))->map(function () {
+    $kelasIds = collect(range(1, 10))->map(function () {
         return \DB::table('daftar__kelas')->insertGetId($this->daftarKelas());
     });
 
+    // Buat Peserta
+    $pesertaIds = collect(range(1, 90))->map(function() use ($kelasIds) {
+        $peserta = $this->peserta();
+        $data =  array_merge($peserta, [
+            'nomor_peserta' => $peserta['nomor_peserta'],
+            'kelas_id'   => fake()->randomElement($kelasIds),
+        ]);
+        \DB::table('pesertas')->insert($data);
+        return $peserta['nomor_peserta'];;
+    });
+
     // Buat Kelompok Ujian
-    $kelompokIds = collect(range(1, $count))->map(function () {
+    $kelompokIds = collect(range(1, 3))->map(function () {
         return \DB::table('kelompok__ujians')->insertGetId($this->kelompokUjian());
     });
 
     // Buat Guru dengan foreign key valid
-    $gurus = collect(range(1, $count))->map(function () use ($mapelIds, $agamaIds) {
+    $gurus = collect(range(1, 10))->map(function () use ($mapelIds, $agamaIds) {
         return array_merge($this->guru(), [
             'mapel_id'  => $mapelIds->random(),
             'agama_id'  => $agamaIds->random(),
@@ -271,11 +285,11 @@ class TestingFactory extends Factory
     \DB::table('gurus')->insert($gurus->toArray());
 
     // Buat Ujian dengan foreign key valid
-    $ujians = collect(range(1, $count))->map(function () use ($kelompokIds, $mapelIds, $kelasIds) {
+    $ujians = collect(range(1, 10))->map(function () use ($kelompokIds, $mapelIds, $kelasIds) {
         return array_merge($this->ujian(), [
-            'kelompok_id' => $kelompokIds->random(),
-            'mapel_id'    => $mapelIds->random(),
-            'kelas_id'    => $kelasIds->random(),
+            'kelompok_id' => fake()->randomElement($kelompokIds),
+            'mapel_id'    =>  fake()->randomElement($mapelIds),
+            'kelas_id'    =>  fake()->randomElement($kelasIds),
         ]);
     });
     \DB::table('ujians')->insert($ujians->toArray());
@@ -289,11 +303,6 @@ class TestingFactory extends Factory
         ]);
     });
     \DB::table('soals')->insert($soals->toArray());
-    $pesertaIds = collect(range(1, $count))->map(function () {
-        $peserta = $this->peserta();
-        \DB::table('pesertas')->insert($peserta);
-        return $peserta['nomor_peserta'];
-    });
     
     $soalIds = \DB::table('soals')->pluck('id')->toArray();
     collect(range(1, $count))->each(function () use ($ujianIds, $soalIds, $pesertaIds) {

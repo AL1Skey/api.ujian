@@ -90,12 +90,13 @@ Route::prefix("/admin")->group(function () {
 
         // Soal
         Route::get("/soal", [SoalController::class, "indexAll"]);
-        Route::get("/soal/{id}", [SoalController::class, "show"]);
+        Route::get("/soal/show/{id}", [SoalController::class, "show"]);
         Route::post("/soal", [SoalController::class, "store"]);
-        Route::put("/soal/{id}", [SoalController::class, "update"]);
-        Route::delete("/soal/{id}", [SoalController::class, "destroy"]);
+        Route::post("/soal/edit/{id}", [SoalController::class, "update"]);
+        Route::delete("/soal/delete/{id}", [SoalController::class, "destroy"]);
 
         Route::post("/import-soal",[SoalController::class,"import"]);
+        // Route::delete("/delete-soal-by-ujian/{ujian_id}", [SoalController::class, "destroyByUjian"]);
 
         // Ujian
         Route::get("/ujian", [UjianController::class, "index"]);
@@ -142,6 +143,8 @@ Route::prefix("/admin")->group(function () {
         
         Route::get("/hasil_ujian/analysis/{id}",[HasilUjianController::class,"hasilUjianAnalysis"]);
         Route::get("/hasil_ujian/analisa_butir_soal/{id}",[HasilUjianController::class,"analisaButirSoal"]);
+        Route::get("/hasil_ujian/ujian/{ujian_id}/kelas/{kelas_id}",[HasilUjianController::class,"hasilUjianSiswaByUjianKelas"]);
+        Route::get("/hasil_ujian/ujian/{ujian_id}",[HasilUjianController::class,"hasilUjianSiswaByUjian"]);
 
 
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);

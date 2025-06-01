@@ -22,18 +22,27 @@ class HasilUjianController extends Controller
             //code...
             $hasil = Hasil_Ujian::query();
             $per_page = $request->query("limit") ?? 100;
-            $hasil->select('hasil__ujians.id','peserta.nama','hasil__ujians.nomor_peserta as nomor_peserta', 'ujian.id as ujian_id','soal.soal','soal.tipe_soal', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi', 'hasil__ujians.isTrue')
+            // $hasil->select('hasil__ujians.id','peserta.nama','hasil__ujians.nomor_peserta as nomor_peserta', 'ujian.id as ujian_id','soal.soal','soal.tipe_soal', 'soal.jawaban as jawaban_soal', 'sesi_soal.jawaban as jawaban_sesi', 'hasil__ujians.isTrue')
+            // ->join('soals as soal', 'hasil__ujians.soal_id', '=', 'soal.id')
+            // ->join('ujians as ujian','hasil__ujians.ujian_id','=','ujian.id')
+            // ->join('sesi__soals as sesi_soal', 'hasil__ujians.sesi_soal_id', '=', 'sesi_soal.id')
+            // ->join('pesertas as peserta', 'hasil__ujians.nomor_peserta', '=', 'peserta.nomor_peserta');
+            $hasil->select('hasil__ujians.id','peserta.nama','hasil__ujians.nomor_peserta as nomor_peserta', 'ujian.id as ujian_id','soal.soal','soal.tipe_soal', 'jawaban_soal', 'jawaban_sesi', 'hasil__ujians.isTrue')
             ->join('soals as soal', 'hasil__ujians.soal_id', '=', 'soal.id')
             ->join('ujians as ujian','hasil__ujians.ujian_id','=','ujian.id')
-            ->join('sesi__soals as sesi_soal', 'hasil__ujians.sesi_soal_id', '=', 'sesi_soal.id')
+            // ->join('sesi__soals as sesi_soal', 'hasil__ujians.sesi_soal_id', '=', 'sesi_soal.id')
             ->join('pesertas as peserta', 'hasil__ujians.nomor_peserta', '=', 'peserta.nomor_peserta');
             
             //dd($request->query('nomor_peserta'));
             
-            if ($request->query('nomor_peserta')) {
-                $hasil->where('hasil__ujians.nomor_peserta', $request->query('nomor_peserta') );
+            if ($request->has('nomor_peserta')) {
+                $nomor_peserta = $request->query('nomor_peserta');
+                $hasil->where(function ($query) use ($nomor_peserta) {
+                    $query->where('hasil__ujians.nomor_peserta', $nomor_peserta)
+                          ->orWhere('peserta.nomor_peserta', $nomor_peserta);
+                });
             }
-            if($request->query('ujian_id')){
+            if($request->has('ujian_id')){
                 $hasil->where('hasil__ujians.ujian_id', $request->query('ujian_id'));
             }
     
@@ -99,7 +108,9 @@ class HasilUjianController extends Controller
                   ->join('pesertas as peserta', 'sesi_soal.nomor_peserta', '=', 'peserta.nomor_peserta')
                   ->chunk(100, function ($data) {
                   foreach ($data as $item) {
-                    $find = Hasil_Ujian::where('nomor_peserta', $item->nomor_peserta)->where('ujian_id', $item->ujian_id)->where('soal_id', $item->soal_id)->where('sesi_soal_id', $item->sesi_soal_id);
+                    $find = Hasil_Ujian::where('nomor_peserta', $item->nomor_peserta)->where('ujian_id', $item->ujian_id)->where('soal_id', $item->soal_id)
+                    // ->where('sesi_soal_id', $item->sesi_soal_id)
+                    ;
                     if($find->count() == 0 && $item->jawaban_soal != null){
                       Hasil_Ujian::create([
                       'nomor_peserta' => $item->nomor_peserta,
@@ -114,6 +125,22 @@ class HasilUjianController extends Controller
                     }
                   }
                   });
+
+                // Remove duplicate entries
+                Hasil_Ujian::query()
+                ->select('nomor_peserta', 'ujian_id', 'soal_id', 'sesi_soal_id')
+                ->groupBy('nomor_peserta', 'ujian_id', 'soal_id', 'sesi_soal_id')
+                ->havingRaw('COUNT(*) > 1')
+                ->chunk(100, function ($duplicates) {
+                    foreach ($duplicates as $duplicate) {
+                        Hasil_Ujian::where('nomor_peserta', $duplicate->nomor_peserta)
+                            ->where('ujian_id', $duplicate->ujian_id)
+                            ->where('soal_id', $duplicate->soal_id)
+                            ->where('sesi_soal_id', $duplicate->sesi_soal_id)
+                            ->delete();
+                    }
+                });
+
                   return response()->json(["msg"=>"Migrate Successfully"],201);
         } catch (\Throwable $th) {
             //throw $th;
@@ -148,7 +175,7 @@ class HasilUjianController extends Controller
                 ->sortByDesc('score');
     
             // Get top 5 students
-            $topStudents = $allScores->take(5);
+            $topStudents = $allScores->take(5)->values();
     
             // Calculate class statistics
             $classAnalysis = $allScores
@@ -238,7 +265,6 @@ class HasilUjianController extends Controller
                 ->where('ujian_id', $ujian_id)
                 ->with('peserta.kelas')
                 ->get();
-    
             // Process all student scores
             $allScores = $records
                 ->groupBy('nomor_peserta')
@@ -247,16 +273,20 @@ class HasilUjianController extends Controller
                     $total = $items->count();
                     $percent = $total ? ($correct / $total) * 100 : 0;
                     $peserta = $items->first()->peserta;
-                    
+                    $benar = $items->where('isTrue', 1)->count();
+                    $salah = $items->where('isTrue', 0)->count();
                     return [
                         'nomor_peserta' => $nomor,
                         'nama' => $peserta->nama,
                         'kelas' => $peserta->kelas->nama ?? 'Unknown',
+                        'benar' => $benar,
+                        'salah' => $salah,
                         'score' => round($percent, 2),
+                        'hasil_ujian' => $items
                     ];
                 })
                 ->values()
-                ->sortByDesc('score');
+                ->sortByDesc('nama');
     
             return response()->json($allScores, 200);
     
@@ -268,6 +298,109 @@ class HasilUjianController extends Controller
         }
     }
 
+    public function hasilUjianSiswaByUjian(Request $request,$ujian_id) {
+        try {
+            // Get all exam results with student and class relationships
+            $records = Hasil_Ujian::where('ujian_id', $ujian_id);
+            if($request->has('kelas_id')){
+                $kelas_id = $request->query('kelas_id');
+                $records->whereHas('peserta', function ($query) use ($kelas_id) {
+                    // This assumes that the 'pesertas' table has a 'kelas_id' foreign key
+                    // referencing the 'id' of the 'kelas' table.
+                    $query->where('kelas_id', $kelas_id);
+                });
+            }
+            if($request->has('tingkatan_id')){
+                $tingkatan_id = $request->query('tingkatan_id');
+                $records->whereHas('peserta', function ($query) use ($tingkatan_id) {
+                    $query->where('id', $tingkatan_id);
+                });
+            }
+
+            $records = $records->get();
+            // Process all student scores
+            $allScores = $records
+                ->groupBy('nomor_peserta')
+                ->map(function($items, $nomor) {
+                    $correct = $items->sum('isTrue');
+                    // $total   = $items->count();
+                    $total = $items->where('isTrue', 1)->count() + $items->where('isTrue', 0)->count();
+                    $percent = $total ? ($correct / $total) : 0;
+                    $peserta = $items->first()->peserta;
+                    $benar   = $items->where('isTrue', 1)->count();
+                    $salah   = $items->where('isTrue', 0)->count();
+                    
+                    return [
+                        'nomor_peserta' => $nomor,
+                        'nama'          => $peserta->nama,
+                        'kelas'         => $peserta->kelas->nama ?? 'Unknown',
+                        'benar'         => $benar,
+                        'salah'         => $salah,
+                        'score'         => (float)sprintf("%.2f", $percent),
+                        // 'hasil_ujian'   => $items,
+                    ];
+                })
+                ->sortBy('nama')
+                ->values()
+                ->all();  // <-- pull out a pure PHP array here
+
+            return response()->json($allScores, 200);
+    
+            // return response()->json($allScores, 200);
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    public function hasilUjianSiswaByUjianKelas($ujian_id, $kelas_id) {
+        try {
+            // Get all exam results with student and class relationships
+            $records = Hasil_Ujian::where('ujian_id', $ujian_id)
+                ->with(['peserta.kelas' => function($query) use ($kelas_id) {
+                    $query->where('id', $kelas_id);
+                }])
+                ->get();
+    
+            // Process all student scores
+            $allScores = $records
+                ->groupBy('nomor_peserta')
+                ->map(function($items, $nomor) {
+                    $correct = $items->sum('isTrue');
+                    // $total = $items->count();
+                    $total = $items->where('isTrue', 1)->count() + $items->where('isTrue', 0)->count();
+                    $percent = $total ? ($correct / $total) * 100 : 0;
+                    $peserta = $items->first()->peserta;
+                    
+                    return [
+                        'nomor_peserta' => $nomor,
+                        'nama' => $peserta->nama,
+                        'kelas' => $peserta->kelas->nama ?? 'Unknown',
+                        'score' => round($percent, 2),
+                        'hasil_ujian' => $items
+                    ];
+                })
+                ->values()
+                ->sortByDesc('score')
+                ;
+    
+            return response()->json($allScores, 200);
+    
+        } catch (\Throwable $th) {
+            return response()->json([
+                'error' => 'Server error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    
+    
+
+
     public function analisaButirSoal($id)
     {
         try {
@@ -275,17 +408,21 @@ class HasilUjianController extends Controller
                     'soals.id as soal_id',
                     'soals.soal',
                     'soals.jawaban as jawaban_benar',
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'A' THEN 1 ELSE 0 END) as count_A"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'B' THEN 1 ELSE 0 END) as count_B"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'C' THEN 1 ELSE 0 END) as count_C"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'D' THEN 1 ELSE 0 END) as count_D"),
-                    DB::raw("SUM(CASE WHEN hasil__ujians.jawaban_sesi = 'E' THEN 1 ELSE 0 END) as count_E"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'a' THEN 1 ELSE 0 END) as count_A"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'b' THEN 1 ELSE 0 END) as count_B"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'c' THEN 1 ELSE 0 END) as count_C"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'd' THEN 1 ELSE 0 END) as count_D"),
+                    DB::raw("SUM(CASE WHEN LOWER(hasil__ujians.jawaban_sesi) = 'e' THEN 1 ELSE 0 END) as count_E"),
                     DB::raw("SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) as correct_count"),
                     DB::raw("SUM(CASE WHEN hasil__ujians.isTrue = 0 THEN 1 ELSE 0 END) as wrong_count"),
+                    // DB::raw("ROUND(
+                    //     SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) 
+                    //     / NULLIF(COUNT(*),0) 
+                    // ,4) as difficulty_ratio")
                     DB::raw("ROUND(
-                        SUM(CASE WHEN hasil__ujians.isTrue = 1 THEN 1 ELSE 0 END) 
-                        / NULLIF(COUNT(*),0) 
-                    ,4) as difficulty_ratio")
+                        SUM(CASE WHEN hasil__ujians.isTrue = 0 THEN 1 ELSE 0 END) 
+                        / NULLIF(COUNT(*), 0), 4) as difficulty_ratio")
+                    
                 )
                 ->join('soals', 'hasil__ujians.soal_id', '=', 'soals.id')
                 ->where('hasil__ujians.ujian_id', $id)
@@ -353,3 +490,55 @@ class HasilUjianController extends Controller
         //
     }
 }
+
+
+
+
+
+
+
+
+
+
+// Backup
+
+
+    // public function hasilUjianSiswaByUjianKelas($ujian_id, $kelas_id) {
+    //     try {
+    //         // Get all exam results with student and class relationships
+    //         $records = Hasil_Ujian::where('ujian_id', $ujian_id)
+    //             ->with(['peserta.kelas' => function($query) use ($kelas_id) {
+    //                 $query->where('id', $kelas_id);
+    //             }])
+    //             ->get();
+    
+    //         // Process all student scores
+    //         $allScores = $records
+    //             ->groupBy('nomor_peserta')
+    //             ->map(function($items, $nomor) {
+    //                 $correct = $items->sum('isTrue');
+    //                 $total = $items->count();
+    //                 $percent = $total ? ($correct / $total) * 100 : 0;
+    //                 $peserta = $items->first()->peserta;
+                    
+    //                 return [
+    //                     'nomor_peserta' => $nomor,
+    //                     'nama' => $peserta->nama,
+    //                     'kelas' => $peserta->kelas->nama ?? 'Unknown',
+    //                     'score' => round($percent, 2),
+    //                     'hasil_ujian' => $items
+    //                 ];
+    //             })
+    //             ->values()
+    //             ->sortByDesc('score')
+    //             ;
+    
+    //         return response()->json($allScores, 200);
+    
+    //     } catch (\Throwable $th) {
+    //         return response()->json([
+    //             'error' => 'Server error',
+    //             'message' => $th->getMessage()
+    //         ], 500);
+    //     }
+    // }

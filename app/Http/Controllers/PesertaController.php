@@ -24,6 +24,13 @@ class PesertaController extends Controller
             if ($request->query("nomor_peserta")) {
                 $peserta->where("nomor_peserta", $request->query("nomor_peserta"));
             }
+            if ($request->has("search")) {
+                $search = $request->query("search");
+                $peserta->where(function ($query) use ($search) {
+                    $query->where("nama", "like", "%{$search}%")
+                        ->orWhere("nomor_peserta", "like", "%{$search}%");
+                });
+            }
 
             $totalPeserta = $peserta->count();
             

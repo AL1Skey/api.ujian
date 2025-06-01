@@ -22,7 +22,7 @@ trait AuthGuruTrait
 
             return response()->json(compact('guru'), 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
@@ -38,13 +38,13 @@ trait AuthGuruTrait
             $guru = Guru::where('username', $credentials['username'])->first();
 
             if (!$guru) {
-                return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
+                return response()->json(['message' => 'invalid_credentials. User not Found'], 400);
             }
 
             // $verifyPassword = Hash::check($credentials['password'], $guru->password);
             $verifyPassword = $guru->password == $credentials['password'];
             if(!$verifyPassword) {
-                return response()->json(['error'=> 'invalid_credentials'],400);
+                return response()->json(['message'=> 'invalid_credentials. Password incorrect'],400);
             }
             $data = $guru->toArray();
             $data['password'] = $credentials['password'];
@@ -55,7 +55,7 @@ trait AuthGuruTrait
 
 
         } catch (\Exception $e) {
-             return response()->json(['error' => 'could_not_create_token','msg'=>$e->getMessage()], 500);
+             return response()->json(['message' => 'could_not_create_token','msg'=>$e->getMessage()], 500);
         }
     }
 
@@ -65,7 +65,7 @@ trait AuthGuruTrait
             // JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Successfully logged out'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'could_not_logout'], 500);
+            return response()->json(['message' => 'could_not_logout'], 500);
         }
     }
 
@@ -96,7 +96,7 @@ trait AuthPesertaTrait
 
             return response()->json(compact('peserta'), 201);
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
@@ -111,7 +111,7 @@ trait AuthPesertaTrait
             $peserta = Peserta::where('nomor_peserta', $credentials['nomor_peserta'])->first();
             
             if (!$peserta) {
-                return response()->json(['error' => 'invalid_credentials. User not Found'], 400);
+                return response()->json(['message' => 'invalid_credentials. User not Found'], 400);
             }
             
             // dd($peserta->password);
@@ -119,7 +119,7 @@ trait AuthPesertaTrait
                 // $verifyPassword = Hash::check($credentials['password'], $peserta->password);
                 $verifyPassword = $peserta->password == $credentials['password'];
                 if(!$verifyPassword) {
-                    return response()->json(['error'=> 'invalid_credentials'],400);
+                    return response()->json(['message'=> 'invalid_credentials. Password incorrect'],400);
                 }
             }
             $data = $peserta->toArray();
@@ -131,7 +131,7 @@ trait AuthPesertaTrait
 
 
         } catch (\Exception $e) {
-            return response()->json(['error' => 'could_not_create_token','err'=>$e->getMessage()], 500);
+            return response()->json(['message' => 'could_not_create_token','err'=>$e->getMessage()], 500);
         }
     }
 
@@ -141,7 +141,7 @@ trait AuthPesertaTrait
             // JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(['message' => 'Successfully logged out'], 200);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'could_not_logout'], 500);
+            return response()->json(['message' => 'could_not_logout'], 500);
         }
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sesi_Ujian;
+use App\Models\Tingkatan;
 use App\Models\Ujian;
 use Illuminate\Http\Request;
 use App\Models\Kelompok_Ujian;
@@ -92,12 +93,22 @@ class UjianController extends Controller
             if ($request->query("kelas_id")) {
                 $ujianQuery->where("ujians.kelas_id", $request->query("kelas_id"));
             }
-            if ($request->query("status")) {
+            if ($request->has("status")) {
                 $ujianQuery->where("ujians.status", $request->query("status"));
             }
             if ($request->query('tingkatan_id')) {
-                $ujianQuery->where('ujians.tingkatan_id', $request->query('tingkatan_id'));
+                $tingkatanId = $request->query('tingkatan_id');
+                $tingkatanModel = Tingkatan::find($tingkatanId);
+                if ($tingkatanModel) {
+                    $ujianQuery->where(function($q) use ($tingkatanId, $tingkatanModel) {
+                        $q->where('ujians.tingkatan_id', $tingkatanId)
+                          ->orWhereHas('kelas', function($q2) use ($tingkatanModel) {
+                              $q2->where('tingkatan', $tingkatanModel->nama);
+                          });
+                    });
+                }
             }
+            
     
             // Eager load relationships
             $ujianQuery->with(["kelompok_ujian", "mapel", "kelas"]);
@@ -159,7 +170,7 @@ class UjianController extends Controller
             $request->validate([
                 'kelompok_id' => 'required|integer',
                 'mapel_id' => 'required|integer',
-                'kelas_id' => 'required|integer',
+                'kelas_id' => 'nullable|integer',
                 'tingkatan_id' => 'nullable',
                 'nama' => 'required|string',
                 'id_sekolah' => 'required|integer',

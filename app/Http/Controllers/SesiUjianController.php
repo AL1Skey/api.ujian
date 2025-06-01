@@ -64,7 +64,25 @@ class SesiUjianController extends Controller
             if(!$check_peserta) {
                 $data['nomor_peserta'] = null;
             }
-            $sesi_ujian = Sesi_Ujian::create($data);
+            // Check if the session already exists
+            $existingSession = Sesi_Ujian::query()
+                ->where('ujian_id', $data['ujian_id'])
+                ->where('nomor_peserta', $data['nomor_peserta'])
+                ->first();
+            
+            if ($existingSession) {
+                Sesi_Ujian::updateOrCreate(
+                    $existingSession->id,
+                    [
+                        // 'start_date' => $data['start_date'],
+                        // 'end_date' => $data['end_date'],
+                        'isTrue' => $data['isTrue'] ?? false,
+                    ]
+                );
+            }
+            else{
+                $sesi_ujian = Sesi_Ujian::create($data);
+            }
             return response()->json($sesi_ujian, 201);
         } catch (\Exception $e) {
             return response()->json(["error" => $e->getMessage()], 400);
