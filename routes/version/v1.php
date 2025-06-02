@@ -84,7 +84,7 @@ Route::prefix("/admin")->group(function () {
         // Sesi Soal
         Route::get("/sesi_soal", [SesiSoalController::class, "index"]);
         Route::get("/sesi_soal/{id}", [SesiSoalController::class, "show"]);
-        Route::post("/sesi_soal", [SesiSoalController::class, "store"]);
+        Route::post("/sesi_soal", [SesiSoalController::class, "upstore"]);
         Route::put("/sesi_soal/{id}", [SesiSoalController::class, "update"]);
         Route::delete("/sesi_soal/{id}", [SesiSoalController::class, "destroy"]);
 
@@ -192,7 +192,6 @@ Route::prefix("/siswa")->group(function(){
         Route::get("/soal", [SoalController::class, "index"]);
         Route::get("/sesi_soal", [SesiSoalController::class, "index"]);
         Route::post("/submit_ujian", [App\Http\Controllers\v1\SubmitUjian\UjianController::class, "submitUjian"]);
-        Route::post("/sesi_soal", [SesiSoalController::class, "upstore"]);
         
         // Calculate the value
         Route::get("/hasil_ujian/migrate", [HasilUjianController::class, "migrate"]);

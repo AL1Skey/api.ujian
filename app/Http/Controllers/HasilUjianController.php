@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Hasil_Ujian;
 use App\Models\Soal;
 use App\Models\Sesi_Soal;
+use App\Models\Tingkatan;
 use App\Models\Ujian;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\TryCatch;
@@ -158,10 +159,46 @@ class HasilUjianController extends Controller
             // Process all student scores
             $allScores = $records
                 ->groupBy('nomor_peserta')
-                ->map(function($items, $nomor) {
+                ->map(function($items, $nomor) use($id) {
                     $correct = $items->sum('isTrue');
                     $total = $items->count();
                     $percent = $total ? ($correct / $total) * 100 : 0;
+                    $peserta = $items->first()->peserta;
+
+                    $correct = $items->sum('isTrue');
+                    // $total   = $items->count();
+                    $soal = Soal::where('ujian_id', $id);
+                    // $total = $items->where('isTrue', 1)->count() + $items->where('isTrue', 0)->count();
+                    $jawaban_benar = $items
+                        
+                        ->filter(function($item) use ($id) {
+                            return \App\Models\Soal::where('id', $item->soal_id)
+                            ->where('ujian_id', $id)
+                            ->exists();
+                        })
+                        ->where('isTrue', 1)
+                        ->unique('soal_id')              // remove duplicate soal_id
+                        ;
+                    $jawaban_salah = $items
+                        
+                        ->filter(function($item) use ($jawaban_benar, $id) {
+                            return \App\Models\Soal::where('id', $item->soal_id)
+                            ->where('ujian_id', $id)
+                            ->exists()
+                                && !$jawaban_benar->contains('soal_id', $item->soal_id);
+                        })
+                        ->where('isTrue', 0)
+                        ->unique('soal_id')              // remove duplicate soal_id
+                        ;
+                    $benar = $jawaban_benar
+                        ->count();
+                    $salah = $jawaban_salah
+                        ->count();
+                    $total = 
+                    // Soal::where('ujian_id', $items->first()->ujian_id)->count() ?? 
+                    $benar + $salah
+                    ;
+                    $percent = $total ? ($benar  / $total) *100 : 0;
                     $peserta = $items->first()->peserta;
                     
                     return [
@@ -309,27 +346,77 @@ class HasilUjianController extends Controller
                     // referencing the 'id' of the 'kelas' table.
                     $query->where('kelas_id', $kelas_id);
                 });
+
+                if($request->has('tingkatan_id')){
+                    $tingkatan_id = $request->query('tingkatan_id');
+                    $tingkatan = Tingkatan::find($tingkatan_id);
+                    $records->orWhereHas('peserta', function($query) use ($tingkatan_id) {
+                        $query->where('tingkatan_id', $tingkatan_id);
+                    })
+                    ->orWhereHas('peserta.kelas', function($query) use ($tingkatan) {
+                        $query->where('nama', 'like', '%' . $tingkatan->nama . '%');
+                    });
+                }
             }
-            if($request->has('tingkatan_id')){
+            else if($request->has('tingkatan_id')){
                 $tingkatan_id = $request->query('tingkatan_id');
-                $records->whereHas('peserta', function ($query) use ($tingkatan_id) {
-                    $query->where('id', $tingkatan_id);
+                $tingkatan = Tingkatan::find($tingkatan_id);
+                $records->whereHas('peserta', function($query) use ($tingkatan_id) {
+                    $query->where('tingkatan_id', $tingkatan_id);
+                })
+                ->orWhereHas('peserta.kelas', function($query) use ($tingkatan) {
+                    $query->where('nama', 'like', '%' . $tingkatan->nama . '%');
                 });
             }
 
+
             $records = $records->get();
+            
             // Process all student scores
             $allScores = $records
                 ->groupBy('nomor_peserta')
-                ->map(function($items, $nomor) {
+                ->map(function($items, $nomor) use ($ujian_id) {
                     $correct = $items->sum('isTrue');
                     // $total   = $items->count();
-                    $total = $items->where('isTrue', 1)->count() + $items->where('isTrue', 0)->count();
-                    $percent = $total ? ($correct / $total) : 0;
+                    $soal = Soal::where('ujian_id', $ujian_id);
+                    // $total = $items->where('isTrue', 1)->count() + $items->where('isTrue', 0)->count();
+                    $jawaban_benar = $items
+                        
+                        ->filter(function($item) use ($ujian_id) {
+                            return \App\Models\Soal::where('id', $item->soal_id)
+                            ->where('ujian_id', $ujian_id)
+                            ->exists();
+                        })
+                        ->where('isTrue', 1)
+                        ->unique('soal_id')              // remove duplicate soal_id
+                        ;
+                    $jawaban_salah = $items
+                        
+                        ->filter(function($item) use ($jawaban_benar, $ujian_id) {
+                            return \App\Models\Soal::where('id', $item->soal_id)
+                            ->where('ujian_id', $ujian_id)
+                            ->exists()
+                                && !$jawaban_benar->contains('soal_id', $item->soal_id);
+                        })
+                        ->where('isTrue', 0)
+                        ->unique('soal_id')              // remove duplicate soal_id
+                        ;
+                    $benar = $jawaban_benar
+                        ->count();
+                    $salah = $jawaban_salah
+                        ->count();
+                    $total = 
+                    // Soal::where('ujian_id', $items->first()->ujian_id)->count() ?? 
+                    $benar + $salah
+                    ;
+                    $percent = $total ? ($benar  / $total) *100 : 0;
                     $peserta = $items->first()->peserta;
-                    $benar   = $items->where('isTrue', 1)->count();
-                    $salah   = $items->where('isTrue', 0)->count();
-                    
+                    // if($percent > 100){
+                    //     return response()->json([
+                    //         "jawaban_benar" => $jawaban_benar->toArray(),
+                    //         "jawaban_salah" => $jawaban_salah->toArray(),
+                    //     ], 400);
+                    // }
                     return [
                         'nomor_peserta' => $nomor,
                         'nama'          => $peserta->nama,
@@ -337,10 +424,11 @@ class HasilUjianController extends Controller
                         'benar'         => $benar,
                         'salah'         => $salah,
                         'score'         => (float)sprintf("%.2f", $percent),
+                        'total'         => $total,
                         // 'hasil_ujian'   => $items,
                     ];
                 })
-                ->sortBy('nama')
+                ->sortBy(['kelas','nama'])
                 ->values()
                 ->all();  // <-- pull out a pure PHP array here
 

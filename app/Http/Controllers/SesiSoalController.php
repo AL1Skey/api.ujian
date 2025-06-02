@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Hasil_Ujian;
 use App\Models\Sesi_Soal;
+use App\Models\Soal;
 use Illuminate\Http\Request;
 
 class SesiSoalController extends Controller
@@ -70,13 +72,39 @@ class SesiSoalController extends Controller
                 'jawaban' => 'string',
             ]);
             $data = $this->handleRequest($request);
-            $soalId = Sesi_Soal::query();
-            $soalId = $soalId->where('ujian_id',$request->ujian_id)->where('soal_id',$request->soal_id)->where('nomor_peserta',$request->nomor_peserta);
+            $sesi_soalId = Sesi_Soal::query();
+            $sesi_soalId = $sesi_soalId->where('ujian_id',$request->ujian_id)->where('soal_id',$request->soal_id)->where('nomor_peserta',$request->nomor_peserta);
             $soal="";
-            if($soalId->exists()){
-                $soal = Sesi_Soal::findOrFail($soalId->first()->id);
-                $soal->update($data);
-                return response()->json($soal, 200);
+            if($sesi_soalId->exists()){
+                $sesi_soal = Sesi_Soal::findOrFail($sesi_soalId->first()->id);
+                $sesi_soal->update($data);
+                $soal = Soal::findOrFail($request->soal_id);
+                
+                $hasilUjian = Hasil_Ujian::where('ujian_id', $request->ujian_id)
+                ->where('nomor_peserta', $request->nomor_peserta)
+                ->where('soal_id', $request->soal_id)
+                ->first();
+
+                if ($hasilUjian) {
+                    $hasilUjian->update([
+                        'jawaban_sesi' => $request->jawaban,
+                        'isTrue' => ($request->jawaban == $soal->jawaban) ? 1 : 0,
+                    ]);
+                } else {
+                    $hasilUjian = Hasil_Ujian::create([
+                        'nomor_peserta' => $request->nomor_peserta,
+                        'ujian_id' => $request->ujian_id,
+                        'soal_id' => $request->soal_id,
+                        'sesi_soal_id' => $sesi_soal->id,
+                        'tipe_soal' => $soal->tipe_soal,
+                        'jawaban_soal' => $soal->jawaban,
+                        'jawaban_sesi' => $request->jawaban,
+                        'isTrue' => ($request->jawaban == $soal->jawaban) ? 1 : 0,
+                    ]);
+                }
+
+                return response()->json(["sesi_soal"=>$soal,"hasil_ujian"=>$hasilUjian], 200);
+
             }
             else{
                 $data['jawaban'] = $request->jawaban;
